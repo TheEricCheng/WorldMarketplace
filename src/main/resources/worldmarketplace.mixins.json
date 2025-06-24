@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.awwwsl.worldmarketplace.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "worldmarketplace.refmap.json",
+  "mixins": [
+    "StructurePlaceMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
