@@ -97,16 +97,14 @@ class PackerBlockItemHandler implements IItemHandler {
         if (belowBlockEntity == null) return stack;
         var lazyCap = belowBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP);
         if (!lazyCap.isPresent()) return stack;
+
         var cap = lazyCap.orElseThrow(RuntimeException::new);
-        var toInsert = PackageSellingItem.fromItem(stack.copy(), market.getCreator());
-        ItemStack inserted = cap.insertItem(slot, toInsert, simulate);
-        if (inserted.isEmpty()) {
-            if(!simulate) {
-                stack.setCount(0);
-            }
+        var toInsert = PackageSellingItem.fromItem(stack, market.getCreator());
+        var remaining = cap.insertItem(slot, toInsert, simulate);
+        if (remaining.isEmpty()) {
             return ItemStack.EMPTY;
         } else {
-            return stack;
+            return stack.split(remaining.getCount());
         }
     }
 

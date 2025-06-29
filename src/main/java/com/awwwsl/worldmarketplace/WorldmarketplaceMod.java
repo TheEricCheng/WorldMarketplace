@@ -1,7 +1,10 @@
 package com.awwwsl.worldmarketplace;
 
+import com.awwwsl.worldmarketplace.api.MarketItem;
 import com.awwwsl.worldmarketplace.blocks.PackerBlock;
 import com.awwwsl.worldmarketplace.blocks.PackerBlockEntity;
+import com.awwwsl.worldmarketplace.blocks.ShipmentBoxBlock;
+import com.awwwsl.worldmarketplace.blocks.ShipmentBoxBlockEntity;
 import com.awwwsl.worldmarketplace.items.PackageSellingItem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -26,14 +29,19 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
+import java.math.BigDecimal;
+import java.util.function.Supplier;
+
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(WorldmarketplaceMod.MODID)
 public class WorldmarketplaceMod {
+    public static BigDecimal ECONOMY = BigDecimal.valueOf(1000);
+    public static final MarketItem MARKET_ITEM = new MarketItem(BigDecimal.valueOf(10), BigDecimal.valueOf(100), BigDecimal.valueOf(0.5f));
 
     // Define mod id in a common place for everything to reference
     public static final String MODID = "worldmarketplace";
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
     // Create a Deferred Register to hold Blocks which will all be registered under the "worldmarketplace" namespace
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     // Create a Deferred Register to hold Items which will all be registered under the "worldmarketplace" namespace
@@ -43,6 +51,10 @@ public class WorldmarketplaceMod {
     public static final RegistryObject<Block> PACKER_BLOCK = BLOCKS.register("packer", PackerBlock::new);
     public static final RegistryObject<Item> PACKER_BLOCK_ITEM = ITEMS.register("packer", () -> new BlockItem(PACKER_BLOCK.get(), new Item.Properties()));
     public static final RegistryObject<BlockEntityType<PackerBlockEntity>> PACKER_BLOCK_ENTITY = BLOCK_ENTITIES.register("packer_block_entity", () -> BlockEntityType.Builder.of(PackerBlockEntity::new, PACKER_BLOCK.get()).build(null));
+
+    public static final RegistryObject<Block> SHIPMENT_BOX_BLOCK = BLOCKS.register("shipment_box", ShipmentBoxBlock::new);
+    public static final RegistryObject<Item> SHIPMENT_BOX_BLOCK_ITEM = ITEMS.register("shipment_box", () -> new BlockItem(SHIPMENT_BOX_BLOCK.get(), new Item.Properties()));
+    public static final RegistryObject<BlockEntityType<ShipmentBoxBlockEntity>> SHIPMENT_BOX_BLOCK_ENTITY = BLOCK_ENTITIES.register("shipment_box_block_entity", () -> BlockEntityType.Builder.of(ShipmentBoxBlockEntity::new, Blocks.CHEST).build(null));
 
     public static final RegistryObject<Item> PACKAGE_SELLING_ITEM = ITEMS.register("package_selling_item", PackageSellingItem::new);
     public WorldmarketplaceMod() {

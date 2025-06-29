@@ -4,6 +4,8 @@ import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TextComponentTagVisitor;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -12,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,14 +32,19 @@ public class PackageSellingItem extends Item {
             return ItemStack.EMPTY;
         }
         ItemStack newStack = new ItemStack(WorldmarketplaceMod.PACKAGE_SELLING_ITEM.get());
+        newStack.setCount(itemStack.getCount());
         CompoundTag tag = new CompoundTag();
         CompoundTag root = new CompoundTag();
-        itemStack.save(tag);
-        itemStack.setCount(0);
-        root.put("item", tag);
+        var item = itemStack.getItem();
+        var name = ForgeRegistries.ITEMS.getKey(item);
+        if(name == null) {
+            WorldmarketplaceMod.LOGGER.warn("Item {} has no name for creating PackageSellingItem", item);
+            return itemStack; // Invalid item, return original stack
+        }
+        root.putString("item", name.toString());
         root.putUUID("creator", creator);
         newStack.setTag(root);
-        newStack.setCount(1);
+        newStack.setCount(itemStack.getCount());
         return newStack;
     }
 
@@ -61,19 +69,19 @@ public class PackageSellingItem extends Item {
                     components.add(Component.literal("Creator: " + creator));
                 }
             }
-            var item = root.getCompound("item");
-            if(item.isEmpty()) {
+            var loc = root.getString("item");
+            if(loc.isEmpty()) {
                 components.add(Component.literal("Invalid package item"));
             } else {
-                ItemStack itemStack = ItemStack.of(item);
-                if(itemStack.isEmpty()) {
+                var item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(loc));
+                if(item == null || item instanceof AirItem) {
                     components.add(Component.literal("Invalid package item"));
                 } else {
-                    components.add(Component.literal("x" + itemStack.getCount() + ": ").append(itemStack.getHoverName()));
+                    components.add(item.getDescription());
                 }
             }
         } catch (Exception e) {
-            components.add(Component.literal("Exception during hovertext rendering:"));
+            components.add(Component.literal("Exception during hover text rendering:"));
             components.add(Component.literal("  ").append(e.getMessage()));
         }
     }
@@ -86,16 +94,18 @@ public class PackageSellingItem extends Item {
             if(root == null) {
                 return InteractionResultHolder.fail(itemStack);
             }
-            var item = root.getCompound("item");
-            if(item.isEmpty()) {
+            var loc = root.getString("item");
+            if(loc.isEmpty()) {
                 return InteractionResultHolder.fail(itemStack);
             }
-            ItemStack containedItem = ItemStack.of(item);
-            if(containedItem.isEmpty()) {
+            var item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(loc));
+            if(item == null) {
+                WorldmarketplaceMod.LOGGER.warn("Item {} not found for PackageSellingItem", loc);
+                itemStack.shrink(1);
                 return InteractionResultHolder.fail(itemStack);
             }
 
-            var drop = player.drop(containedItem, true);
+            var drop = player.drop(new ItemStack(item), true);
             if(drop != null) {
                 drop.setNoPickUpDelay();
             }
