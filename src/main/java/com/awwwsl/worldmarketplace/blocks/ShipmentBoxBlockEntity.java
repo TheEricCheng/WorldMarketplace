@@ -119,8 +119,10 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
         save(tag);
     }
     public CompoundTag save(@NotNull CompoundTag tag) {
-        tag.putInt("chunkX", this.center.x);
-        tag.putInt("chunkZ", this.center.z);
+        if (this.center != null) {
+            tag.putInt("chunkX", this.center.x);
+            tag.putInt("chunkZ", this.center.z);
+        }
         return tag;
     }
 
