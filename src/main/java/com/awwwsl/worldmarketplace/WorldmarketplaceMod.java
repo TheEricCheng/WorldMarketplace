@@ -60,8 +60,7 @@ public class WorldmarketplaceMod {
 
     public static final RegistryObject<MenuType<VirtualChestMenu>> VIRTUAL_CHEST_MENU_TYPE = MENU_TYPES.register("virtual_chest_menu_type", () -> IForgeMenuType.create(VirtualChestMenu::new));
     public WorldmarketplaceMod() {
-        //noinspection removal
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        @SuppressWarnings("removal") IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);

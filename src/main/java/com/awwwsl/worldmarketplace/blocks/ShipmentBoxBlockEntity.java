@@ -23,7 +23,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
@@ -37,7 +36,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -213,7 +211,7 @@ class ShipmentBoxItemHandler implements IItemHandler {
 
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-        if(stack.getItem() == WorldmarketplaceMod.PACKAGE_SELLING_ITEM.get()) {;
+        if(stack.getItem() == WorldmarketplaceMod.PACKAGE_SELLING_ITEM.get()) {
             return true;
         } else {
             return false;

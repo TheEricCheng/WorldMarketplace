@@ -2,8 +2,6 @@ package com.awwwsl.worldmarketplace;
 
 import com.awwwsl.worldmarketplace.api.Economy;
 import com.awwwsl.worldmarketplace.api.Market;
-import com.awwwsl.worldmarketplace.api.MarketDefaults;
-import com.awwwsl.worldmarketplace.blocks.ShipmentBoxBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -16,7 +14,6 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
-import net.minecraft.world.item.AirItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;

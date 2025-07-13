@@ -44,7 +44,7 @@ public class ShipmentBoxBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+    public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
         return new ShipmentBoxBlockEntity(blockPos, blockState);
     }
 
@@ -64,6 +64,7 @@ public class ShipmentBoxBlock extends Block implements EntityBlock {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState blockState,
                                           Level level,

@@ -9,7 +9,6 @@ import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 public class MarketSavedData extends SavedData {
     public static final String DATA_NAME = "worldmarketplace_markets";
