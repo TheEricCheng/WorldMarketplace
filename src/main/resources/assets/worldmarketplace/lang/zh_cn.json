@@ -1,4 +1,13 @@
 {
   "item.worldmarketplace.package_selling_item": "打包好的物品",
-  "block.worldmarketplace.packer": "打包机"
+  "block.worldmarketplace.packer": "打包机",
+  "block.worldmarketplace.shipment_box": "出货箱",
+  "config.jade.plugin_worldmarketplace.block_component_provider": "World Marketplace 方块组件",
+  "tooltip.worldmarketplace.shipment_box.error": "Exception during tooltip render: %s",
+  "tooltip.worldmarketplace.shipment_box.not_bound": "此处无村庄",
+  "structure.minecraft.village_plains": "平原村庄",
+  "structure.minecraft.village_desert": "沙漠村庄",
+  "structure.minecraft.village_savanna": "稀树草原村庄",
+  "structure.minecraft.village_snowy": "雪原村庄",
+  "structure.minecraft.village_taiga": "针叶林村庄"
 }

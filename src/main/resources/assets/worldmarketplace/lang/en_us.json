@@ -1,4 +1,13 @@
 {
   "item.worldmarketplace.package_selling_item": "Packed Item",
-  "block.worldmarketplace.packer": "Packer"
+  "block.worldmarketplace.packer": "Packer",
+  "block.worldmarketplace.shipment_box": "Shipment Box",
+  "config.jade.plugin_worldmarketplace.block_component_provider": "World Marketplace Block Component",
+  "tooltip.worldmarketplace.shipment_box.error": "Exception during tooltip render: %s",
+  "tooltip.worldmarketplace.shipment_box.not_bound": "No village here",
+  "structure.minecraft.village_plains": "Plain Village",
+  "structure.minecraft.village_desert": "Desert Village",
+  "structure.minecraft.village_savanna": "Savanna Village",
+  "structure.minecraft.village_snowy": "Snowy Village",
+  "structure.minecraft.village_taiga": "Taiga Village"
 }

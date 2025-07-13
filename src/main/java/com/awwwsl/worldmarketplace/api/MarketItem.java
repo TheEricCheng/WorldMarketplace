@@ -1,76 +1,55 @@
 package com.awwwsl.worldmarketplace.api;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
+import java.time.LocalDateTime;
 
 public class MarketItem {
-    private final BigDecimal basePrice;
-    private BigDecimal offset;
-    private final BigDecimal volume;
-    private BigDecimal traded; // + for buying from market, - for selling to market
-    // 0-1
-    private final BigDecimal tau;
+    public ResourceLocation id;
+    public BigDecimal basePrice;
+    public BigDecimal offset;
+    public LocalDateTime lastUpdate;
 
-    private static final MathContext MATH_CTX = new MathContext(10, RoundingMode.HALF_UP);
-    private static final BigDecimal PRECISION = new BigDecimal("0.001");
+    public BigDecimal computed;
 
-    public MarketItem(BigDecimal basePrice, BigDecimal volume, BigDecimal tau) {
+    public MarketItem(ResourceLocation id, BigDecimal basePrice, BigDecimal offset) {
+        this.id = id;
         this.basePrice = basePrice;
-        this.offset = BigDecimal.ZERO;
-        this.volume = volume;
-        this.tau = tau;
-        this.traded = BigDecimal.ZERO;
-    }
-
-    public void setOffset(@NotNull BigDecimal offset) {
         this.offset = offset;
+        this.lastUpdate = LocalDateTime.now();
     }
 
-    public void sell(@NotNull BigDecimal quantity) {
-        if (quantity.signum() == 0) return; // No trade if quantity is zero
-        this.traded = this.traded.subtract(quantity, MATH_CTX);
-    }
-    public void buy(@NotNull BigDecimal quantity) {
-        if (quantity.signum() == 0) return; // No trade if quantity is zero
-        this.traded = this.traded.add(quantity, MATH_CTX);
-    }
-
-    public BigDecimal getPrice() {
-        // price = (basePrice + offset) * e^(traded / volume)
-        BigDecimal baseWithOffset = this.basePrice.add(this.offset);
-        BigDecimal exponent = this.traded.divide(this.volume, MATH_CTX);
-        BigDecimal price = baseWithOffset.multiply(BigDecimal.valueOf(Math.exp(exponent.doubleValue())), MATH_CTX);
-        return price.setScale(4, RoundingMode.HALF_EVEN);
+    private MarketItem(
+        ResourceLocation id,
+        BigDecimal basePrice,
+        BigDecimal offset,
+        LocalDateTime lastUpdate
+    ) {
+        this.id = id;
+        this.basePrice = basePrice;
+        this.offset = offset;
+        this.lastUpdate = lastUpdate;
     }
 
-    public BigDecimal getTotalPrice(BigDecimal quantity) {
-        BigDecimal baseWithOffset = this.basePrice.add(this.offset);
-
-        BigDecimal exponentStart = this.traded.divide(this.volume, MATH_CTX);
-        BigDecimal exponentEnd = this.traded.add(quantity).divide(this.volume, MATH_CTX);
-
-        double eStart = Math.exp(exponentStart.doubleValue());
-        double eEnd = Math.exp(exponentEnd.doubleValue());
-
-        BigDecimal integral = baseWithOffset
-                .multiply(this.volume, MATH_CTX)
-                .multiply(BigDecimal.valueOf(eEnd - eStart), MATH_CTX);
-
-        return integral.setScale(4, RoundingMode.HALF_EVEN);
+    public static @NotNull MarketItem load(@NotNull CompoundTag tag) {
+        var basePrice = new BigDecimal(tag.getString("basePrice"));
+        var offset = new BigDecimal(tag.getString("offset"));
+        return new MarketItem(
+            ResourceLocation.parse(tag.getString("id")),
+            basePrice,
+            offset,
+            LocalDateTime.parse(tag.getString("lastUpdate"))
+        );
     }
 
-    public void decay() {
-        traded = traded.multiply(BigDecimal.ONE.subtract(tau, MATH_CTX), MATH_CTX);
-
-        if (traded.abs().divide(this.volume, MATH_CTX).compareTo(PRECISION) < 0) {
-            traded = BigDecimal.ZERO;
-        }
-    }
-
-    public @NotNull  BigDecimal getTraded() {
-        return traded;
+    public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
+        tag.putString("id", id.toString());
+        tag.putString("basePrice", basePrice.toString());
+        tag.putString("offset", offset.toString());
+        tag.putString("lastUpdate", lastUpdate.toString());
+        return tag;
     }
 }
