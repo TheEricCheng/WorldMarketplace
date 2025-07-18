@@ -8,12 +8,15 @@ import com.awwwsl.worldmarketplace.items.ChequeItem;
 import com.awwwsl.worldmarketplace.items.PackageSellingItem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.Comparator;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @SuppressWarnings("unused")
@@ -49,6 +53,7 @@ public class WorldmarketplaceMod {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MOD_ID);
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MOD_ID);
+    public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
 
     public static final RegistryObject<Block> PACKER_BLOCK = BLOCKS.register("packer", PackerBlock::new);
     public static final RegistryObject<Item> PACKER_BLOCK_ITEM = ITEMS.register("packer", () -> new BlockItem(PACKER_BLOCK.get(), new Item.Properties()));
@@ -70,6 +75,19 @@ public class WorldmarketplaceMod {
 
     public static final RegistryObject<MenuType<MarketMenu>> MARKET_MENU_TYPE = MENU_TYPES.register("market_menu_type", () -> IForgeMenuType.create(MarketMenu::new));
     public static final RegistryObject<MenuType<ChequeMachineMenu>> CHEQUE_MACHINE_MENU_TYPE = MENU_TYPES.register("cheque_machine_menu_type", () -> IForgeMenuType.create(ChequeMachineMenu::new));
+
+    public static final RegistryObject<CreativeModeTab> MOD_CREATIVE_MODE_TAB = CREATIVE_MODE_TABS.register("creative_tab", () ->
+            CreativeModeTab.builder()
+                    .title(Component.literal("WorldMarketplace"))
+                    .icon(() -> new ItemStack(PACKAGE_SELLING_ITEM.get()))
+                    .displayItems((parameters, output) -> {
+                        ITEMS.getEntries().forEach(entry -> {
+                            output.accept(entry.get());
+                        });
+                    })
+                    .build()
+    );
+
     public WorldmarketplaceMod() {
         @SuppressWarnings("removal") IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -77,6 +95,7 @@ public class WorldmarketplaceMod {
         ITEMS.register(modEventBus);
         BLOCK_ENTITIES.register(modEventBus);
         MENU_TYPES.register(modEventBus);
+        CREATIVE_MODE_TABS.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         // ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, ModConfig.SPEC);
