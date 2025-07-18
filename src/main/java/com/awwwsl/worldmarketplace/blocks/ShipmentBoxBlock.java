@@ -36,8 +36,6 @@ import snownee.jade.api.config.IPluginConfig;
 public class ShipmentBoxBlock extends Block implements EntityBlock {
     public ShipmentBoxBlock() {
         super(BlockBehaviour.Properties.of()
-                .strength(-1.0F, 3_600_000.0F)
-                .noLootTable()
                 .mapColor(MapColor.WOOD)
                 .sound(SoundType.WOOD)
         );
