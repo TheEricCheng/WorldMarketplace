@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -35,10 +36,7 @@ import snownee.jade.api.config.IPluginConfig;
 
 public class ShipmentBoxBlock extends Block implements EntityBlock {
     public ShipmentBoxBlock() {
-        super(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.WOOD)
-                .sound(SoundType.WOOD)
-        );
+        super(Properties.copy(Blocks.OAK_WOOD));
     }
 
     @Override
@@ -134,5 +132,4 @@ public class ShipmentBoxBlock extends Block implements EntityBlock {
             }
         }
     }
-
 }

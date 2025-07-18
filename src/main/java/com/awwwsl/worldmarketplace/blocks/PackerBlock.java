@@ -6,6 +6,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -18,10 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PackerBlock extends Block implements EntityBlock {
     public PackerBlock() {
-        super(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.WOOD)
-                .sound(SoundType.WOOD)
-        );
+        super(Properties.copy(Blocks.IRON_BLOCK));
     }
 
     @Override
