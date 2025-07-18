@@ -52,7 +52,7 @@ public class PackerBlockEntity extends BlockEntity {
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {
-        if(side != Direction.UP) {
+        if(side == Direction.DOWN) {
             return LazyOptional.empty();
         }
         if(cap == ForgeCapabilities.ITEM_HANDLER) {
