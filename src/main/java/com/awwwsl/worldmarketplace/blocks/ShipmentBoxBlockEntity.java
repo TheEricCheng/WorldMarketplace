@@ -2,7 +2,7 @@ package com.awwwsl.worldmarketplace.blocks;
 
 import com.awwwsl.worldmarketplace.MarketSavedData;
 import com.awwwsl.worldmarketplace.ModConfig;
-import com.awwwsl.worldmarketplace.VirtualChestMenu;
+import com.awwwsl.worldmarketplace.display.MarketMenu;
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import com.awwwsl.worldmarketplace.api.Economy;
 import com.awwwsl.worldmarketplace.api.Market;
@@ -64,7 +64,25 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
                 BuiltinStructures.VILLAGE_SAVANNA,
                 BuiltinStructures.VILLAGE_TAIGA,
                 BuiltinStructures.VILLAGE_DESERT,
-                BuiltinStructures.VILLAGE_PLAINS
+                BuiltinStructures.VILLAGE_PLAINS,
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_badlands")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_birch_forest")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_beach")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_flower_forest")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_forest")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_grove")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_jungle")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_meadow")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_wooded_badlands")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_ocean")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_old_growth_taiga")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_savanna_plateau")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_snowy_slopes")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_snowy_taiga")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_sparse_jungle")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_sunflower_plains")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_swamp")),
+                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_mushroom_fields"))
         );
         StructureStart start = StructureStart.INVALID_START;
         for(ResourceKey<Structure> structure : toFetch) {
@@ -102,7 +120,7 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int id, @NotNull Inventory inventory, @NotNull Player player) {
-        return new VirtualChestMenu(id, inventory, Objects.requireNonNull(this.getMarket()));
+        return new MarketMenu(id, inventory, Objects.requireNonNull(this.getMarket()));
     }
 
     public @Nullable Market getMarket() {

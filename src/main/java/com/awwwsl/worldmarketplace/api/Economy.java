@@ -42,4 +42,15 @@ public class Economy {
         // TODO: this is biz so item price should be integral calculated
         setBalance(player, eco.add(price));
     }
+
+    public static boolean withdraw(ServerPlayer serverPlayer, BigDecimal amount, boolean simulate) {
+        var balance  = getBalance(serverPlayer);
+        if(balance.compareTo(amount) < 0) {
+            return false;
+        }
+        if(!simulate) {
+            setBalance(serverPlayer, balance.subtract(amount));
+        }
+        return true;
+    }
 }

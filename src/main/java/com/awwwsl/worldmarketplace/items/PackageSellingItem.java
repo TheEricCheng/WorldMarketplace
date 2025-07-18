@@ -2,19 +2,12 @@ package com.awwwsl.worldmarketplace.items;
 
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TextComponentTagVisitor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.AirItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,19 +26,30 @@ public class PackageSellingItem extends Item {
         }
         ItemStack newStack = new ItemStack(WorldmarketplaceMod.PACKAGE_SELLING_ITEM.get());
         newStack.setCount(itemStack.getCount());
-        CompoundTag tag = new CompoundTag();
         CompoundTag root = new CompoundTag();
-        var item = itemStack.getItem();
-        var name = ForgeRegistries.ITEMS.getKey(item);
-        if(name == null) {
-            WorldmarketplaceMod.LOGGER.warn("Item {} has no name for creating PackageSellingItem", item);
-            return itemStack; // Invalid item, return original stack
-        }
-        root.putString("item", name.toString());
+        CompoundTag itemTag = new CompoundTag();
+        var copiedStack = itemStack.copy();
+        copiedStack.setCount(1);
+        copiedStack.save(itemTag);
+        root.put("item", itemTag);
         root.putUUID("creator", creator);
         newStack.setTag(root);
-        newStack.setCount(itemStack.getCount());
         return newStack;
+    }
+
+    public static @NotNull ItemStack getContainedItemStack(@NotNull ItemStack itemStack) {
+        if(itemStack.getItem() != WorldmarketplaceMod.PACKAGE_SELLING_ITEM.get()) {
+            throw new IllegalArgumentException("ItemStack is not a stack of PackageSellingItem");
+        }
+        var root = itemStack.getTag();
+        if(root == null) {
+            return ItemStack.EMPTY;
+        }
+        var tag = root.getCompound("item");
+        if(tag.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        return ItemStack.of(tag);
     }
 
     @Override
@@ -69,50 +73,46 @@ public class PackageSellingItem extends Item {
                     components.add(Component.literal("Creator: " + creator));
                 }
             }
-            var loc = root.getString("item");
-            if(loc.isEmpty()) {
+
+            // draw contained item
+            var item = getContainedItemStack(stack);
+            if(item.isEmpty()) {
                 components.add(Component.literal("Invalid package item"));
             } else {
-                var item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(loc));
-                if(item == null || item instanceof AirItem) {
-                    components.add(Component.literal("Invalid package item"));
-                } else {
-                    components.add(item.getDescription());
-                }
+                components.add(Component.literal("Contains: ").append(item.getHoverName()));
             }
         } catch (Exception e) {
-            components.add(Component.literal("Exception during hover text rendering:"));
-            components.add(Component.literal("  ").append(e.getMessage()));
+            components.clear();
+            components.add(Component.literal("Exception during hover text rendering: ").append(e.toString()));
+//            components.add(Component.literal("  ").append(Component.nullToEmpty(e.getStackTrace())));
         }
     }
 
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
         var itemStack = player.getItemInHand(hand);
-        if(player.isCrouching() && !itemStack.isEmpty()) {
-            var root = itemStack.getTag();
-            if(root == null) {
-                return InteractionResultHolder.fail(itemStack);
-            }
-            var loc = root.getString("item");
-            if(loc.isEmpty()) {
-                return InteractionResultHolder.fail(itemStack);
-            }
-            var item = ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(loc));
-            if(item == null) {
-                WorldmarketplaceMod.LOGGER.warn("Item {} not found for PackageSellingItem", loc);
-                itemStack.shrink(1);
-                return InteractionResultHolder.fail(itemStack);
-            }
+        if (itemStack.isEmpty() || itemStack.getItem() != WorldmarketplaceMod.PACKAGE_SELLING_ITEM.get()) {
+            return InteractionResultHolder.pass(itemStack);
+        }
 
-            var drop = player.drop(new ItemStack(item), true);
+        var item = getContainedItemStack(itemStack);
+        if(player.isCrouching()) {
+            item.setCount(itemStack.getCount());
+            itemStack.setCount(0);
+        } else {
+            item.setCount(1);
+            itemStack.shrink(1);
+        }
+        while(!item.isEmpty()) {
+            var dropStack = item.split(item.getMaxStackSize());
+            if(dropStack.isEmpty()) {
+                break;
+            }
+            var drop = player.drop(dropStack, false);
             if(drop != null) {
                 drop.setNoPickUpDelay();
             }
-
-            if(!player.isCreative()) itemStack.shrink(1);
-            return InteractionResultHolder.success(itemStack);
         }
-        return InteractionResultHolder.pass(itemStack);
+        return InteractionResultHolder.success(itemStack);
     }
 }

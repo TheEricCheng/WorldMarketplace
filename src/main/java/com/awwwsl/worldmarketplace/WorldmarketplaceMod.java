@@ -1,12 +1,16 @@
 package com.awwwsl.worldmarketplace;
 
-import com.awwwsl.worldmarketplace.blocks.PackerBlock;
-import com.awwwsl.worldmarketplace.blocks.PackerBlockEntity;
-import com.awwwsl.worldmarketplace.blocks.ShipmentBoxBlock;
-import com.awwwsl.worldmarketplace.blocks.ShipmentBoxBlockEntity;
+import com.awwwsl.worldmarketplace.blocks.*;
+import com.awwwsl.worldmarketplace.display.ChequeMachineMenu;
+import com.awwwsl.worldmarketplace.display.MarketMenu;
+import com.awwwsl.worldmarketplace.display.VirtualChestScreen;
+import com.awwwsl.worldmarketplace.items.ChequeItem;
 import com.awwwsl.worldmarketplace.items.PackageSellingItem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -56,9 +60,16 @@ public class WorldmarketplaceMod {
     @SuppressWarnings("DataFlowIssue")
     public static final RegistryObject<BlockEntityType<ShipmentBoxBlockEntity>> SHIPMENT_BOX_BLOCK_ENTITY = BLOCK_ENTITIES.register("shipment_box_block_entity", () -> BlockEntityType.Builder.of(ShipmentBoxBlockEntity::new, Blocks.CHEST).build(null));
 
-    public static final RegistryObject<Item> PACKAGE_SELLING_ITEM = ITEMS.register("package_selling_item", PackageSellingItem::new);
+    public static final RegistryObject<Block> CHEQUE_MACHINE_BLOCK = BLOCKS.register("cheque_machine", ChequeMachineBlock::new);
+    public static final RegistryObject<Item> CHEQUE_MACHINE_BLOCK_ITEM = ITEMS.register("cheque_machine", () -> new BlockItem(CHEQUE_MACHINE_BLOCK.get(), new Item.Properties()));
+    @SuppressWarnings("DataFlowIssue")
+    public static final RegistryObject<BlockEntityType<ChequeMachineBlockEntity>> CHEQUE_MACHINE_BLOCK_ENTITY = BLOCK_ENTITIES.register("cheque_machine_block_entity", () -> BlockEntityType.Builder.of(ChequeMachineBlockEntity::new, CHEQUE_MACHINE_BLOCK.get()).build(null));
 
-    public static final RegistryObject<MenuType<VirtualChestMenu>> VIRTUAL_CHEST_MENU_TYPE = MENU_TYPES.register("virtual_chest_menu_type", () -> IForgeMenuType.create(VirtualChestMenu::new));
+    public static final RegistryObject<Item> PACKAGE_SELLING_ITEM = ITEMS.register("package_selling_item", PackageSellingItem::new);
+    public static final RegistryObject<Item> CHEQUE_ITEM = ITEMS.register("cheque", ChequeItem::new);
+
+    public static final RegistryObject<MenuType<MarketMenu>> MARKET_MENU_TYPE = MENU_TYPES.register("market_menu_type", () -> IForgeMenuType.create(MarketMenu::new));
+    public static final RegistryObject<MenuType<ChequeMachineMenu>> CHEQUE_MACHINE_MENU_TYPE = MENU_TYPES.register("cheque_machine_menu_type", () -> IForgeMenuType.create(ChequeMachineMenu::new));
     public WorldmarketplaceMod() {
         @SuppressWarnings("removal") IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -74,6 +85,7 @@ public class WorldmarketplaceMod {
 
     @SubscribeEvent
     public void onClientSetup(FMLClientSetupEvent event) {
-        MenuScreens.register(VIRTUAL_CHEST_MENU_TYPE.get(), VirtualChestScreen::new);
+        MenuScreens.register(MARKET_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
+        MenuScreens.register(CHEQUE_MACHINE_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 1));
     }
 }

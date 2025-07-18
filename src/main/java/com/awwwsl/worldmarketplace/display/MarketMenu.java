@@ -1,5 +1,6 @@
-package com.awwwsl.worldmarketplace;
+package com.awwwsl.worldmarketplace.display;
 
+import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import com.awwwsl.worldmarketplace.api.Economy;
 import com.awwwsl.worldmarketplace.api.Market;
 import net.minecraft.ChatFormatting;
@@ -22,11 +23,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class VirtualChestMenu extends AbstractContainerMenu {
+public class MarketMenu extends AbstractContainerMenu {
     private final Market market;
 
-    public VirtualChestMenu(int containerId, Inventory inv, Market market) {
-        super(WorldmarketplaceMod.VIRTUAL_CHEST_MENU_TYPE.get(), containerId);
+    public MarketMenu(int containerId, Inventory inv, Market market) {
+        super(WorldmarketplaceMod.MARKET_MENU_TYPE.get(), containerId);
         this.market = market;
         Container container = new SimpleContainer(54);
         for(int i = 0; i < market.items().size(); i++) {
@@ -78,7 +79,7 @@ public class VirtualChestMenu extends AbstractContainerMenu {
             this.addSlot(new Slot(inv, col, 8 + col * 18, 198));
         }
     }
-    public VirtualChestMenu(int containerId, Inventory playerInventory, FriendlyByteBuf data) {
+    public MarketMenu(int containerId, Inventory playerInventory, FriendlyByteBuf data) {
         this(containerId, playerInventory, Market.load(Objects.requireNonNull(data.readNbt())));
     }
 
@@ -116,6 +117,10 @@ public class VirtualChestMenu extends AbstractContainerMenu {
 
     @Override
     public void clicked(int index, int button, @NotNull ClickType type, @NotNull Player player) {
+        if(index >= 54) {
+            super.clicked(index, button, type, player);
+            return;
+        }
         if(player instanceof ServerPlayer serverPlayer) {
             var slot = getSlot(index);
             var item = slot.getItem().getItem();
@@ -150,23 +155,3 @@ public class VirtualChestMenu extends AbstractContainerMenu {
     }
 }
 
-class DisplayOnlySlot extends Slot {
-    public DisplayOnlySlot(Container container, int index, int x, int y) {
-        super(container, index, x, y);
-    }
-
-    @Override
-    public boolean mayPlace(@NotNull ItemStack itemStack) {
-        return false;
-    }
-
-    @Override
-    public boolean mayPickup(@NotNull Player player) {
-        return false;
-    }
-
-    @Override
-    public @NotNull ItemStack remove(int i) {
-        return ItemStack.EMPTY;
-    }
-}
