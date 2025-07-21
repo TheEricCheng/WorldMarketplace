@@ -28,6 +28,19 @@ public record Market(
         );
     }
 
+    public static @NotNull Market newFromDefaultsFilter(
+            @NotNull MarketDefaults defaults,
+            @NotNull java.util.function.Predicate<MarketItem> filter
+    ) {
+        return new Market(
+            defaults.location(),
+            defaults.marketItems().stream()
+                    .map(e -> new MarketItem(e.item(), e.basePrice(), e.offset()))
+                    .filter(filter)
+                    .toList()
+        );
+    }
+
     public static Market load(@NotNull CompoundTag tag) {
         ResourceLocation villageType = ResourceLocation.parse(tag.getString("villageType"));
         ListTag list = tag.getList("items", CompoundTag.TAG_COMPOUND);

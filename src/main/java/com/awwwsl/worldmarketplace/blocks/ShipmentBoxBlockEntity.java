@@ -25,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraftforge.common.capabilities.Capability;
@@ -36,7 +35,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Objects;
 
 public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider {
@@ -58,32 +56,21 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
 
     public void generateMarket(ServerLevel level, BlockPos blockPos) {
         var manager = level.structureManager();
-        // TODO: read from config
-        var toFetch = List.of(
-                BuiltinStructures.VILLAGE_SNOWY,
-                BuiltinStructures.VILLAGE_SAVANNA,
-                BuiltinStructures.VILLAGE_TAIGA,
-                BuiltinStructures.VILLAGE_DESERT,
-                BuiltinStructures.VILLAGE_PLAINS,
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_badlands")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_birch_forest")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_beach")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_flower_forest")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_forest")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_grove")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_jungle")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_meadow")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_wooded_badlands")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_ocean")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_old_growth_taiga")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_savanna_plateau")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_snowy_slopes")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_snowy_taiga")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_sparse_jungle")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_sunflower_plains")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_swamp")),
-                ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("towns_and_towers:village_mushroom_fields"))
-        );
+        // TODO: cache this
+        var toFetch = ModConfig.getWorldMarket(level.getServer()).markets().stream().map(market -> {
+            ResourceLocation loc = market.location();
+            return ResourceKey.create(Registries.STRUCTURE, loc);
+        }).filter(
+            key -> {
+                var structures = level.getServer().registryAccess().registryOrThrow(Registries.STRUCTURE);
+                if(structures.getOptional(key).isPresent()) {
+                    return true;
+                } else {
+                    WorldmarketplaceMod.LOGGER.warn("Structure {} not found in registry, skipping", key.location());
+                    return false;
+                }
+            }
+        ).toList();
         StructureStart start = StructureStart.INVALID_START;
         for(ResourceKey<Structure> structure : toFetch) {
             start = manager.getStructureWithPieceAt(blockPos, structure);
@@ -93,7 +80,7 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
         }
         StructureStart finalStart = start;
         if(start != StructureStart.INVALID_START) {
-            var worldDefaults = ModConfig.getWorldMarket();
+            var worldDefaults = ModConfig.getWorldMarket(level.getServer());
             var defaults = worldDefaults.markets();
             Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
             var optFirst = defaults.stream().filter(
@@ -104,7 +91,14 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
                 var savedData = MarketSavedData.get(level);
                 var market = savedData.getMarket(level, finalStart.getChunkPos());
                 if(market == null) {
-                    market = Market.newFromDefaults(first);
+                    var itemRegistry = level.getServer().registryAccess().registryOrThrow(Registries.ITEM);
+                    market = Market.newFromDefaultsFilter(first, marketItem -> {
+                        if(itemRegistry.getOptional(marketItem.id).isEmpty()) {
+                            WorldmarketplaceMod.LOGGER.warn("Market item {} not found in registry, skipping", marketItem.id);
+                            return false; // Skip items not found in registry
+                        }
+                        return true;
+                    });
                     savedData.saveMarket(level, finalStart.getChunkPos(), market);
                 }
                 this.center = finalStart.getChunkPos();
