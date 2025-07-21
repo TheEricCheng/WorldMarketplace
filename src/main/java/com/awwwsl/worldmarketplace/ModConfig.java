@@ -35,7 +35,14 @@ public class ModConfig {
     public static void onServerStarting(ServerStartingEvent event) {
         var srv = event.getServer();
         var world = srv.getWorldPath(LevelResource.ROOT);
-        var config = world.resolve("worldmarketplace.toml").toFile();
+        var config = world.resolve("serverconfig/worldmarketplace.toml").toFile();
+        try {
+            if(!config.getParentFile().exists()) {
+                config.getParentFile().mkdir();
+            }
+        } catch (Exception e) {
+            WorldmarketplaceMod.LOGGER.error("Failed to create config directory at {}", config.getParentFile().getAbsolutePath(), e);
+        }
         if(!config.exists()) {
             try {
                 if(!config.createNewFile() || !config.setWritable(true)) {
@@ -65,4 +72,3 @@ public class ModConfig {
         }
     }
 }
-
