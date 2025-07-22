@@ -32,8 +32,21 @@ public class Economy {
         player.getPersistentData().put("worldmarketplace", compound);
     }
 
-    public static void buy(ServerPlayer player, MarketItem item, int amount) {
-        throw new NotImplementedException();
+    public static boolean buy(ServerPlayer player, MarketItem item, int amount) {
+        var eco = getBalance(player);
+        var price = item.basePrice.multiply(new BigDecimal(amount));
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Price cannot be negative: " + price);
+        }
+        if(eco.compareTo(price) < 0) {
+            return false;
+        }
+        setBalance(player, eco.subtract(price));
+        return true;
+    }
+
+    public static BigDecimal getPrice(MarketItem item, int amount) {
+        return item.basePrice.multiply(new BigDecimal(amount));
     }
 
     public static void sell(ServerPlayer player, MarketItem item, int amount) {

@@ -54,16 +54,46 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
                 : super.getCapability(cap, side);
     }
 
-    public void generateMarket(ServerLevel level, BlockPos blockPos) {
+    public void generateMarket(ServerLevel level, StructureStart start) {
+        if (start == StructureStart.INVALID_START) {
+            throw new IllegalArgumentException("Invalid structure start provided");
+        }
+        var worldDefaults = ModConfig.getWorldMarket(level.getServer());
+        var defaults = worldDefaults.markets();
+        Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
+        var optFirst = defaults.stream().filter(
+            e -> e.location().equals(registry.getKey(start.getStructure()))
+        ).findFirst();
+        if (optFirst.isPresent()) {
+            var first = optFirst.orElseThrow();
+            var savedData = MarketSavedData.get(level);
+            var market = savedData.getMarket(level, start.getChunkPos());
+            if (market == null) {
+                var itemRegistry = level.getServer().registryAccess().registryOrThrow(Registries.ITEM);
+                market = Market.newFromDefaultsFilter(first, marketItem -> {
+                    if (itemRegistry.getOptional(marketItem.id).isEmpty()) {
+                        WorldmarketplaceMod.LOGGER.warn("Market item {} not found in registry, skipping", marketItem.id);
+                        return false; // Skip items not found in registry
+                    }
+                    return true;
+                });
+                savedData.saveMarket(level, start.getChunkPos(), market);
+            }
+            this.center = start.getChunkPos();
+        }
+        setChanged();
+    }
+
+    /// StructureStart.INVALID_START for when no structure is found
+    public static @NotNull StructureStart queryCenter(ServerLevel level, BlockPos blockPos) {
         var manager = level.structureManager();
-        // TODO: cache this
         var toFetch = ModConfig.getWorldMarket(level.getServer()).markets().stream().map(market -> {
             ResourceLocation loc = market.location();
             return ResourceKey.create(Registries.STRUCTURE, loc);
         }).filter(
             key -> {
                 var structures = level.getServer().registryAccess().registryOrThrow(Registries.STRUCTURE);
-                if(structures.getOptional(key).isPresent()) {
+                if (structures.getOptional(key).isPresent()) {
                     return true;
                 } else {
                     WorldmarketplaceMod.LOGGER.warn("Structure {} not found in registry, skipping", key.location());
@@ -72,39 +102,13 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
             }
         ).toList();
         StructureStart start = StructureStart.INVALID_START;
-        for(ResourceKey<Structure> structure : toFetch) {
+        for (ResourceKey<Structure> structure : toFetch) {
             start = manager.getStructureWithPieceAt(blockPos, structure);
-            if(start.isValid() && start != StructureStart.INVALID_START) {
+            if (start.isValid() && start != StructureStart.INVALID_START) {
                 break;
             }
         }
-        StructureStart finalStart = start;
-        if(start != StructureStart.INVALID_START) {
-            var worldDefaults = ModConfig.getWorldMarket(level.getServer());
-            var defaults = worldDefaults.markets();
-            Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
-            var optFirst = defaults.stream().filter(
-                    e -> e.location().equals(registry.getKey(finalStart.getStructure()))
-            ).findFirst();
-            if(optFirst.isPresent()) {
-                var first = optFirst.orElseThrow();
-                var savedData = MarketSavedData.get(level);
-                var market = savedData.getMarket(level, finalStart.getChunkPos());
-                if(market == null) {
-                    var itemRegistry = level.getServer().registryAccess().registryOrThrow(Registries.ITEM);
-                    market = Market.newFromDefaultsFilter(first, marketItem -> {
-                        if(itemRegistry.getOptional(marketItem.id).isEmpty()) {
-                            WorldmarketplaceMod.LOGGER.warn("Market item {} not found in registry, skipping", marketItem.id);
-                            return false; // Skip items not found in registry
-                        }
-                        return true;
-                    });
-                    savedData.saveMarket(level, finalStart.getChunkPos(), market);
-                }
-                this.center = finalStart.getChunkPos();
-            }
-        }
-        setChanged();
+        return start;
     }
 
     @Override

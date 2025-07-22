@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
@@ -54,7 +55,10 @@ public class ShipmentBoxBlock extends Block implements EntityBlock {
             ServerLevel serverLevel = (ServerLevel) level;
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity instanceof ShipmentBoxBlockEntity shipmentBoxBlockEntity) {
-                shipmentBoxBlockEntity.generateMarket(serverLevel, blockPos);
+                var center = ShipmentBoxBlockEntity.queryCenter(serverLevel, blockPos);
+                if(center != StructureStart.INVALID_START) {
+                    shipmentBoxBlockEntity.generateMarket(serverLevel, center);
+                }
             }
         }
     }

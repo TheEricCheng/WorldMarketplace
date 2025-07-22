@@ -2,6 +2,7 @@ package com.awwwsl.worldmarketplace;
 
 import com.awwwsl.worldmarketplace.blocks.*;
 import com.awwwsl.worldmarketplace.display.ChequeMachineMenu;
+import com.awwwsl.worldmarketplace.display.InboxMenu;
 import com.awwwsl.worldmarketplace.display.MarketMenu;
 import com.awwwsl.worldmarketplace.display.VirtualChestScreen;
 import com.awwwsl.worldmarketplace.items.ChequeItem;
@@ -33,7 +34,6 @@ import org.slf4j.Logger;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.Comparator;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @SuppressWarnings("unused")
@@ -70,11 +70,18 @@ public class WorldmarketplaceMod {
     @SuppressWarnings("DataFlowIssue")
     public static final RegistryObject<BlockEntityType<ChequeMachineBlockEntity>> CHEQUE_MACHINE_BLOCK_ENTITY = BLOCK_ENTITIES.register("cheque_machine_block_entity", () -> BlockEntityType.Builder.of(ChequeMachineBlockEntity::new, CHEQUE_MACHINE_BLOCK.get()).build(null));
 
+    public static final RegistryObject<Block> INBOX_BLOCK = BLOCKS.register("inbox", InboxBlock::new);
+    public static final RegistryObject<Item> INBOX_BLOCK_ITEM = ITEMS.register("inbox", () -> new BlockItem(INBOX_BLOCK.get(), new Item.Properties()));
+    @SuppressWarnings("DataFlowIssue")
+    public static final RegistryObject<BlockEntityType<InboxBlockEntity>> INBOX_BLOCK_ENTITY = BLOCK_ENTITIES.register("inbox_block_entity", () -> BlockEntityType.Builder.of(InboxBlockEntity::new, INBOX_BLOCK.get()).build(null));
+
+
     public static final RegistryObject<Item> PACKAGE_SELLING_ITEM = ITEMS.register("package_selling_item", PackageSellingItem::new);
     public static final RegistryObject<Item> CHEQUE_ITEM = ITEMS.register("cheque", ChequeItem::new);
 
     public static final RegistryObject<MenuType<MarketMenu>> MARKET_MENU_TYPE = MENU_TYPES.register("market_menu_type", () -> IForgeMenuType.create(MarketMenu::new));
     public static final RegistryObject<MenuType<ChequeMachineMenu>> CHEQUE_MACHINE_MENU_TYPE = MENU_TYPES.register("cheque_machine_menu_type", () -> IForgeMenuType.create(ChequeMachineMenu::new));
+    public static final RegistryObject<MenuType<InboxMenu>> INBOX_MENU_TYPE = MENU_TYPES.register("inbox_menu_type", () -> IForgeMenuType.create(InboxMenu::new));
 
     public static final RegistryObject<CreativeModeTab> MOD_CREATIVE_MODE_TAB = CREATIVE_MODE_TABS.register("creative_tab", () ->
             CreativeModeTab.builder()
@@ -106,5 +113,6 @@ public class WorldmarketplaceMod {
     public void onClientSetup(FMLClientSetupEvent event) {
         MenuScreens.register(MARKET_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
         MenuScreens.register(CHEQUE_MACHINE_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 1));
+        MenuScreens.register(INBOX_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
     }
 }
