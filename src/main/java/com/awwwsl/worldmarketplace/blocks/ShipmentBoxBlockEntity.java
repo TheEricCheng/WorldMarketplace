@@ -125,7 +125,7 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
         if(this.level instanceof ServerLevel serverLevel) {
             return MarketSavedData.get(serverLevel).getMarket(serverLevel, this.center);
         } else {
-            throw new RuntimeException("ShipmentBoxBlockEntity::getMarket can only be called on server side");
+            return null;
         }
     }
 
