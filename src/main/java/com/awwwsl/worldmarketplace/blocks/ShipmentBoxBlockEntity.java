@@ -35,6 +35,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider {
@@ -180,14 +181,14 @@ class ShipmentBoxItemHandler implements IItemHandler {
         Item item;
         ServerPlayer player;
         try {
-            var itemTag = root.getString("item");
-            var creator = root.getUUID("creator");
+            var itemTag = root.getCompound("item");
             if(itemTag.isEmpty()) {
                 WorldmarketplaceMod.LOGGER.warn("Item tag is empty");
                 return stack;
             }
-            var loc = ResourceLocation.parse(itemTag);
-            item = ForgeRegistries.ITEMS.getValue(loc);
+            var itemStack = ItemStack.of(itemTag);
+            item = itemStack.getItem();
+            var creator = root.getUUID("creator");
             assert blockEntity.getLevel() != null;
             assert blockEntity.getLevel().getServer() != null;
             player = blockEntity.getLevel().getServer().getPlayerList().getPlayer(creator);
@@ -195,10 +196,6 @@ class ShipmentBoxItemHandler implements IItemHandler {
         } catch (Exception e) {
             WorldmarketplaceMod.LOGGER.warn("Failed to parse item tag", e);
             return stack; // Invalid item, return original stack
-        }
-        if(item == null) {
-            WorldmarketplaceMod.LOGGER.warn("Item not found");
-            return stack; // Item not found, return original stack
         }
         if(player == null) {
             WorldmarketplaceMod.LOGGER.warn("Player not found");
@@ -211,7 +208,7 @@ class ShipmentBoxItemHandler implements IItemHandler {
 
         if(!simulate) {
             Economy.sell(player, marketItem, stack.getCount());
-            player.sendSystemMessage(Component.literal("You have sold " + stack.getCount() + " " + item.getDescriptionId() + " for " + marketItem.basePrice + " credits. Now you have " + Economy.getBalance(player) + " economy,"));
+            player.sendSystemMessage(Component.literal("You have sold " + stack.getCount() + " " + item.getDescriptionId() + " for " + WorldmarketplaceMod.DECIMAL_FORMAT.format(marketItem.basePrice.multiply(BigDecimal.valueOf(stack.getCount()))) + " credits. Now you have " + Economy.getBalance(player) + " credits,"));
         }
 
         return ItemStack.EMPTY;
