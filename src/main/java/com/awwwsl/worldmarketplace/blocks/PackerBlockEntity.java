@@ -104,7 +104,7 @@ class PackerBlockItemHandler implements IItemHandler {
         if (remaining.isEmpty()) {
             return ItemStack.EMPTY;
         } else {
-            return stack.split(remaining.getCount());
+            return new ItemStack(stack.getItem(), remaining.getCount());
         }
     }
 
