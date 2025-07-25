@@ -32,6 +32,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
@@ -40,6 +41,8 @@ import java.text.DecimalFormat;
 @Mod(WorldmarketplaceMod.MOD_ID)
 public class WorldmarketplaceMod {
     public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.00");
+    public static final MathContext MATH_CONTEXT = new MathContext(4, RoundingMode.HALF_EVEN);
+
     static {
         DECIMAL_FORMAT.setRoundingMode(RoundingMode.HALF_EVEN);
     }

@@ -65,12 +65,14 @@ public record Market(
 
     @Contract(pure = true)
     @Override
+    @NotNull
     public List<MarketItem> items() {
         return items;
     }
 
     @Contract(pure = true)
     @Override
+    @NotNull
     public ResourceLocation villageType() {
         return villageType;
     }

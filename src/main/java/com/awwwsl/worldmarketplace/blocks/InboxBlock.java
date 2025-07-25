@@ -48,7 +48,7 @@ public class InboxBlock extends Block implements EntityBlock {
             ServerLevel serverLevel = (ServerLevel) level;
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity instanceof InboxBlockEntity inboxBlockEntity) {
-                var center = ShipmentBoxBlockEntity.queryCenter(serverLevel, blockPos);
+                var center = InboxBlockEntity.queryCenter(serverLevel, blockPos);
                 if(center != StructureStart.INVALID_START) {
                     inboxBlockEntity.generateMarket(serverLevel, center);
                 }
