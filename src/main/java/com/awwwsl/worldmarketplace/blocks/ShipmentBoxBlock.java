@@ -55,7 +55,7 @@ public class ShipmentBoxBlock extends Block implements EntityBlock {
             ServerLevel serverLevel = (ServerLevel) level;
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity instanceof ShipmentBoxBlockEntity shipmentBoxBlockEntity) {
-                var center = ShipmentBoxBlockEntity.queryCenter(serverLevel, blockPos);
+                var center = WorldmarketplaceMod.Utils.queryCenter(serverLevel, blockPos);
                 if(center != StructureStart.INVALID_START) {
                     shipmentBoxBlockEntity.generateMarket(serverLevel, center);
                 }

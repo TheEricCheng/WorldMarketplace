@@ -1,5 +1,6 @@
 package com.awwwsl.worldmarketplace.blocks;
 
+import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -48,7 +49,7 @@ public class InboxBlock extends Block implements EntityBlock {
             ServerLevel serverLevel = (ServerLevel) level;
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity instanceof InboxBlockEntity inboxBlockEntity) {
-                var center = InboxBlockEntity.queryCenter(serverLevel, blockPos);
+                var center = WorldmarketplaceMod.Utils.queryCenter(serverLevel, blockPos);
                 if(center != StructureStart.INVALID_START) {
                     inboxBlockEntity.generateMarket(serverLevel, center);
                 }

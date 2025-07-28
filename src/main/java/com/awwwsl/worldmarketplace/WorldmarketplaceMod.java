@@ -9,8 +9,13 @@ import com.awwwsl.worldmarketplace.items.ChequeItem;
 import com.awwwsl.worldmarketplace.items.PackageSellingItem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -21,6 +26,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,11 +39,13 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.Optional;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @SuppressWarnings("unused")
@@ -117,5 +128,67 @@ public class WorldmarketplaceMod {
         MenuScreens.register(MARKET_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
         MenuScreens.register(CHEQUE_MACHINE_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 1));
         MenuScreens.register(INBOX_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
+    }
+    public static class Utils {
+        @SuppressWarnings("deprecation")
+        public static @NotNull StructureStart queryCenter(ServerLevel level, BlockPos blockPos) {
+            var manager = level.structureManager();
+            var registry = level.getServer().registryAccess().registryOrThrow(Registries.STRUCTURE);
+            var toFetch = ModConfig.getWorldMarket(level.getServer()).markets().stream().map(market -> {
+                ResourceLocation loc = market.location();
+                return ResourceKey.create(Registries.STRUCTURE, loc);
+            }).map(
+                key -> {
+                    var optional = registry.getOptional(key);
+                    if(optional.isPresent()) {
+                        return optional;
+                    } else {
+                        WorldmarketplaceMod.LOGGER.warn("Structure {} not found in registry, skipping", key.location());
+                        return Optional.<Structure>empty();
+                    }
+                }
+            ).flatMap(Optional::stream).toList();
+            StructureStart start = StructureStart.INVALID_START;
+            for (Structure structure : toFetch) {
+                BoundingBox aabb = null;
+
+                for(StructureStart possibleStart : manager.startsForStructure(SectionPos.of(blockPos), structure)){
+                    if(possibleStart == StructureStart.INVALID_START) continue; // what
+                    for(StructurePiece piece : possibleStart.getPieces()) {
+                        if(aabb == null){
+                            aabb = piece.getBoundingBox();
+                        }
+
+                        aabb.encapsulate(piece.getBoundingBox());
+                    }
+                    assert aabb != null;
+                    aabb = scaleBoundingBox(aabb, 0.4, 3);
+                    WorldmarketplaceMod.LOGGER.debug("Structure {} found at {}, AABB: {}", structure, possibleStart.getChunkPos(), aabb);
+                    if(aabb.isInside(blockPos)){
+                        start = possibleStart;
+                        break;
+                    }
+                }
+            }
+            return start;
+        }
+
+        private static BoundingBox scaleBoundingBox(BoundingBox box, double xzScale, int yExpand) {
+            int centerX = (box.minX() + box.maxX()) / 2;
+            int centerZ = (box.minZ() + box.maxZ()) / 2;
+
+            int halfX = (int) Math.ceil((box.getXSpan() * xzScale) / 2.0);
+            int halfZ = (int) Math.ceil((box.getZSpan() * xzScale) / 2.0);
+
+            int minX = centerX - halfX;
+            int maxX = centerX + halfX;
+            int minZ = centerZ - halfZ;
+            int maxZ = centerZ + halfZ;
+
+            int minY = box.minY() - yExpand;
+            int maxY = box.maxY() + yExpand;
+
+            return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        }
     }
 }

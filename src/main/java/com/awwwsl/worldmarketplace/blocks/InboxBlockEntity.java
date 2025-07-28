@@ -122,31 +122,6 @@ public class InboxBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     /// StructureStart.INVALID_START for when no structure is found
-    public static @NotNull StructureStart queryCenter(ServerLevel level, BlockPos blockPos) {
-        var manager = level.structureManager();
-        var toFetch = ModConfig.getWorldMarket(level.getServer()).markets().stream().map(market -> {
-            ResourceLocation loc = market.location();
-            return ResourceKey.create(Registries.STRUCTURE, loc);
-        }).filter(
-            key -> {
-                var structures = level.getServer().registryAccess().registryOrThrow(Registries.STRUCTURE);
-                if (structures.getOptional(key).isPresent()) {
-                    return true;
-                } else {
-                    WorldmarketplaceMod.LOGGER.warn("Structure {} not found in registry, skipping", key.location());
-                    return false;
-                }
-            }
-        ).toList();
-        StructureStart start = StructureStart.INVALID_START;
-        for (ResourceKey<Structure> structure : toFetch) {
-            start = manager.getStructureWithPieceAt(blockPos, structure);
-            if (start.isValid() && start != StructureStart.INVALID_START) {
-                break;
-            }
-        }
-        return start;
-    }
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {
