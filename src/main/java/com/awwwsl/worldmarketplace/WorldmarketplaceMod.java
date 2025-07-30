@@ -6,6 +6,7 @@ import com.awwwsl.worldmarketplace.display.InboxMenu;
 import com.awwwsl.worldmarketplace.display.MarketMenu;
 import com.awwwsl.worldmarketplace.display.VirtualChestScreen;
 import com.awwwsl.worldmarketplace.items.ChequeItem;
+import com.awwwsl.worldmarketplace.items.CommunityCenterBlockItem;
 import com.awwwsl.worldmarketplace.items.PackageSellingItem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -89,6 +90,10 @@ public class WorldmarketplaceMod {
     @SuppressWarnings("DataFlowIssue")
     public static final RegistryObject<BlockEntityType<InboxBlockEntity>> INBOX_BLOCK_ENTITY = BLOCK_ENTITIES.register("inbox_block_entity", () -> BlockEntityType.Builder.of(InboxBlockEntity::new, INBOX_BLOCK.get()).build(null));
 
+    public static final RegistryObject<Block> COMMUNITY_CENTER_BLOCK = BLOCKS.register("community_center", CommunityCenterBlock::new);
+    public static final RegistryObject<Item> COMMUNITY_CENTER_BLOCK_ITEM = ITEMS.register("community_center", CommunityCenterBlockItem::new);
+    @SuppressWarnings("DataFlowIssue")
+    public static final RegistryObject<BlockEntityType<CommuniyCenterBlockEntity>> COMMUNITY_CENTER_BLOCK_ENTITY = BLOCK_ENTITIES.register("community_center_block_entity", () -> BlockEntityType.Builder.of(CommuniyCenterBlockEntity::new, COMMUNITY_CENTER_BLOCK.get()).build(null));
 
     public static final RegistryObject<Item> PACKAGE_SELLING_ITEM = ITEMS.register("package_selling_item", PackageSellingItem::new);
     public static final RegistryObject<Item> CHEQUE_ITEM = ITEMS.register("cheque", ChequeItem::new);
