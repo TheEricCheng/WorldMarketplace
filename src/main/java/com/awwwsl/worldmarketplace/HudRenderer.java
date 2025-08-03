@@ -12,6 +12,9 @@ import net.minecraftforge.fml.common.Mod;
 public class HudRenderer {
     @SubscribeEvent
     public static void onRenderGameOverlay(RenderGuiEvent.Post event) {
+        if(Minecraft.getInstance().options.renderDebug) {
+            return;
+        }
         var player = Minecraft.getInstance().player;
         var font = Minecraft.getInstance().font;
         if (player != null) {

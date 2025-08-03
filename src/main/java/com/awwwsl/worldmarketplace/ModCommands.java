@@ -1,6 +1,7 @@
 package com.awwwsl.worldmarketplace;
 
 import com.awwwsl.worldmarketplace.api.Economy;
+import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -9,10 +10,15 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
@@ -24,6 +30,11 @@ public class ModCommands {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
         CommandBuildContext context = event.getBuildContext();
         register(dispatcher, context, event.getCommandSelection());
+    }
+    @SubscribeEvent
+    public static void onRegisterClientCommand(RegisterClientCommandsEvent event) {
+        CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
+        dispatcher.register(dump());
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) {
@@ -75,5 +86,40 @@ public class ModCommands {
                     return 1;
                 });
     }
+    private static LiteralArgumentBuilder<CommandSourceStack> dump() {
+        return Commands.literal("dump")
+            .executes(ctx -> {
+                if(!ctx.getSource().getLevel().isClientSide) return 0;
+                try(FileWriter file = new FileWriter("dump.json")){
+                    try(JsonWriter writer = new JsonWriter(file)) {
+                        writer.setIndent("    ");
+                        writer.beginObject();
+                        writer.name("items");
+                        writer.beginArray();
+                        ForgeRegistries.ITEMS.getEntries().forEach((entry) -> {
+                            var item = entry.getValue();
 
+                            var id = entry.getKey();
+                            var name = item.getDescription().getString();
+                            var maxStackSize = item.getMaxStackSize(new ItemStack(item));
+
+                            try {
+                                writer.beginObject();
+                                writer.name("id").value(id.toString());
+                                writer.name("name").value(name);
+                                writer.name("maxStackSize").value(maxStackSize);
+                                writer.endObject();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                        writer.endArray();
+                        writer.endObject();
+                        return 1;
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+    }
 }

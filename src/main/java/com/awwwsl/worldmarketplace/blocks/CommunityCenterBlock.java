@@ -2,46 +2,29 @@ package com.awwwsl.worldmarketplace.blocks;
 
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CommunityCenterBlock extends Block implements EntityBlock {
+public class CommunityCenterBlock extends CommonHorizontalDirectionalBlock implements EntityBlock {
     public CommunityCenterBlock() {
-        super(Properties.copy(Blocks.OAK_WOOD)
-            .strength(3.0F));
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+        super(Properties.copy(Blocks.OAK_WOOD).noOcclusion());
     }
 
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    @Override
+    public int getLightBlock(BlockState p_60585_, BlockGetter p_60586_, BlockPos p_60587_) {
+        return 0;
+    }
 
     @Override
     public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
         return new CommuniyCenterBlockEntity(blockPos, blockState);
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> blockBlockStateBuilder) {
-        super.createBlockStateDefinition(blockBlockStateBuilder);
-        blockBlockStateBuilder.add(FACING);
-    }
-
-    @Override
-    public @Nullable BlockState getStateForPlacement(@NotNull BlockPlaceContext blockPlaceContext) {
-        var state = super.getStateForPlacement(blockPlaceContext);
-        if(state == null) state = this.defaultBlockState();
-        return state.setValue(FACING, blockPlaceContext.getHorizontalDirection().getOpposite());
     }
 
     @Override

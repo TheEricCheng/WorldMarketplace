@@ -1,5 +1,8 @@
 {
     "variants": {
-        "": { "model": "worldmarketplace:block/packer" }
+        "facing=north": { "model": "worldmarketplace:block/packer" },
+        "facing=south": { "model": "worldmarketplace:block/packer", "y": 180 },
+        "facing=west":  { "model": "worldmarketplace:block/packer", "y": 270 },
+        "facing=east":  { "model": "worldmarketplace:block/packer", "y": 90 }
     }
 }
