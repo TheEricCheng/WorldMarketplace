@@ -128,7 +128,7 @@ public class CommunityCenterBlockItem extends BlockItem {
         Direction right = facing.getClockWise(); // 向右偏移方向
 
         for(int dx = -1; dx <= 1; dx++) {
-            for(int dy = 0; dy <= 2; dy++) {
+            for(int dy = 0; dy <= 1; dy++) {
                 BlockPos checking = origin.offset(right.getStepX() * dx, dy, right.getStepZ() * dx);
                 BlockState checkingState = level.getBlockState(checking);
                 if(!checkingState.isAir() && !checkingState.canBeReplaced()){
@@ -144,7 +144,7 @@ public class CommunityCenterBlockItem extends BlockItem {
         Direction right = facing.getClockWise();
 
         for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = 0; dy <= 2; dy++) {
+            for (int dy = 0; dy <= 1; dy++) {
                 BlockPos checking = origin.offset(right.getStepX() * dx, dy, right.getStepZ() * dx);
                 BlockState target = WorldmarketplaceMod.COMMUNITY_CENTER_BLOCK.get().defaultBlockState()
                     .setValue(BlockStateProperties.HORIZONTAL_FACING, facing.getOpposite());

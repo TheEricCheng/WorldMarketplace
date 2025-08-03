@@ -37,7 +37,7 @@ public class CommunityCenterBlock extends CommonHorizontalDirectionalBlock imple
             var facing = blockState.getValue(FACING);
             var right = facing.getClockWise();
             for(int dx = -1; dx <= 1; dx++) {
-                for(int dy = 0; dy <= 2; dy++) {
+                for(int dy = 0; dy <= 1; dy++) {
                     BlockPos pos = center.offset(right.getStepX() * dx, dy, right.getStepZ() * dx);
                     if(pos.equals(blockPos)) continue;
                     BlockState state = level.getBlockState(pos);
