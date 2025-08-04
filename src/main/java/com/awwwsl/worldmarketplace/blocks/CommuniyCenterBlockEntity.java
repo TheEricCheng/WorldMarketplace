@@ -4,6 +4,7 @@ import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 
 public class CommuniyCenterBlockEntity extends BlockEntity {
@@ -112,26 +114,36 @@ public class CommuniyCenterBlockEntity extends BlockEntity {
         }
 
         @Override
-        public void render(CommuniyCenterBlockEntity be, float partialTicks, PoseStack poseStack,
-                           MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+        public void render(@NotNull CommuniyCenterBlockEntity be, float partialTicks, PoseStack poseStack,
+                           @NotNull MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
             poseStack.pushPose();
 
             // 可选居中
             poseStack.translate(0, 0, 0);
 
-            BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
-            BakedModel model = dispatcher.getBlockModel(be.getBlockState());
+            if(bufferSource instanceof OutlineBufferSource) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
+                BakedModel model = dispatcher.getBlockModel(be.getBlockState());
 
-            dispatcher.getModelRenderer().renderModel(
-                poseStack.last(),
-                bufferSource.getBuffer(RenderType.cutout()), // 通常是 cutout 或 translucent
-                be.getBlockState(),
-                model,
-                1.0f, 1.0f, 1.0f,
-                packedLight,
-                OverlayTexture.NO_OVERLAY
-            );
+                dispatcher.getModelRenderer().renderModel(
+                    poseStack.last(),
+                    bufferSource.getBuffer(RenderType.cutout()),
+                    be.getBlockState(),
+                    model,
+                    1.0f, 1.0f, 1.0f,
+                    packedLight,
+                    OverlayTexture.NO_OVERLAY,
+                    ModelData.EMPTY,
+                    RenderType.cutout()
+                );
 
+            }
             poseStack.popPose();
         }
     }

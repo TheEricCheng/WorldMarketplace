@@ -18,11 +18,22 @@ import org.jetbrains.annotations.Nullable;
 
 public class ChequeMachineBlock extends CommonHorizontalDirectionalBlock implements EntityBlock {
     public ChequeMachineBlock() {
-        super(Properties.copy(Blocks.OAK_WOOD).noOcclusion());
+        super(Properties.copy(Blocks.OAK_WOOD).noOcclusion().isViewBlocking(CommonHorizontalDirectionalBlock::viewBlockingNever));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public int getLightBlock(BlockState p_60585_, BlockGetter p_60586_, BlockPos p_60587_) {
+    public float getShadeBrightness(@NotNull BlockState p_48731_, @NotNull BlockGetter p_48732_, @NotNull BlockPos p_48733_) {
+        return 1.0F;
+    }
+
+    public boolean propagatesSkylightDown(@NotNull BlockState p_48740_, @NotNull BlockGetter p_48741_, @NotNull BlockPos p_48742_) {
+        return true;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getLightBlock(@NotNull BlockState p_60585_, @NotNull BlockGetter p_60586_, @NotNull BlockPos p_60587_) {
         return 0;
     }
 
