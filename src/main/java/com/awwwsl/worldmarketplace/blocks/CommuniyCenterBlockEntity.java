@@ -1,6 +1,10 @@
 package com.awwwsl.worldmarketplace.blocks;
 
+import com.awwwsl.worldmarketplace.MarketSavedData;
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
+import com.awwwsl.worldmarketplace.api.Market;
+import com.awwwsl.worldmarketplace.display.CommunityCenterMenu;
+import com.awwwsl.worldmarketplace.display.InboxMenu;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -13,19 +17,31 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class CommuniyCenterBlockEntity extends BlockEntity {
+import java.util.Objects;
+
+public class CommuniyCenterBlockEntity extends BlockEntity implements MenuProvider {
 
     @SuppressWarnings("NotNullFieldNotInitialized")
     @NotNull
     private BlockPos center;
+
+    @NotNull
+    private ChunkPos marketCenter;
     public CommuniyCenterBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(WorldmarketplaceMod.COMMUNITY_CENTER_BLOCK_ENTITY.get(), blockPos, blockState);
     }
@@ -93,6 +109,25 @@ public class CommuniyCenterBlockEntity extends BlockEntity {
     @Override
     public boolean hasCustomOutlineRendering(Player player) {
         return true;
+    }
+
+    @Override
+    public @Nullable AbstractContainerMenu createMenu(int containerId, @NotNull Inventory inventory, @NotNull Player player) {
+        return new CommunityCenterMenu(containerId, inventory, Objects.requireNonNull(this.getMarket()));
+    }
+
+    public Market getMarket() {
+        if(this.level instanceof ServerLevel serverLevel) {
+            var center = WorldmarketplaceMod.Utils.queryCenter(serverLevel, this.center).getChunkPos();
+            return MarketSavedData.get(serverLevel).getMarket(serverLevel, center);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.literal("Community Center");
     }
 
     public static class Renderer implements BlockEntityRenderer<CommuniyCenterBlockEntity> {

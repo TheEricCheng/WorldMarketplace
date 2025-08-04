@@ -2,8 +2,8 @@ package com.awwwsl.worldmarketplace.display;
 
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import com.awwwsl.worldmarketplace.api.Economy;
+import com.awwwsl.worldmarketplace.api.Market;
 import com.awwwsl.worldmarketplace.items.ChequeItem;
-import com.google.common.collect.ImmutableList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,27 +18,20 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
-public class ChequeMachineMenu extends AbstractContainerMenu {
-    private static final ImmutableList<ItemStack> WITHDRAW_AMOUNTS = ImmutableList.of(
-            ChequeItem.from(BigDecimal.valueOf(1)),
-            ChequeItem.from(BigDecimal.valueOf(10)),
-            ChequeItem.from(BigDecimal.valueOf(100)),
-            ChequeItem.from(BigDecimal.valueOf(1000)),
-            ChequeItem.from(BigDecimal.valueOf(10000))
-    );
-    public ChequeMachineMenu(int containerId, Inventory inv) {
-        super(WorldmarketplaceMod.CHEQUE_MACHINE_MENU_TYPE.get(), containerId);
+public class CommunityCenterMenu extends AbstractContainerMenu {
+    public CommunityCenterMenu(int containerId, Inventory inv, Market market) {
+        super(WorldmarketplaceMod.COMMUNITY_CENTER_MENU_TYPE.get(), containerId);
 
-        int rows = 1; // 如果以后变成动态的也可以设置为参数
-        Container container = new SimpleContainer(9);
-        for (int i = 0; i < WITHDRAW_AMOUNTS.size(); i++) {
-            container.setItem(i, WITHDRAW_AMOUNTS.get(i));
-        }
+        int rows = 6; // 如果以后变成动态的也可以设置为参数
+        Container container = new SimpleContainer(54);
 
         // 容器栏
-        for (int col = 0; col < 9; ++col) {
-            this.addSlot(new DisplayOnlySlot(container, col, 8 + col * 18, 18));
+        for (int row = 0; row < 6; ++row) {
+            for (int col = 0; col < 9; ++col) {
+                this.addSlot(new DisplayOnlySlot(container, col + row * 9, 8 + col * 18, 18 + row * 18));
+            }
         }
 
         int playerInventoryY = 18 + rows * 18 + 13;
@@ -57,8 +50,8 @@ public class ChequeMachineMenu extends AbstractContainerMenu {
         }
     }
 
-    public ChequeMachineMenu(int containerId, Inventory playerInventory, FriendlyByteBuf data) {
-        this(containerId, playerInventory);
+    public CommunityCenterMenu(int containerId, Inventory playerInventory, FriendlyByteBuf data) {
+        this(containerId, playerInventory, Market.load(Objects.requireNonNull(data.readNbt())));
     }
 
     @Override

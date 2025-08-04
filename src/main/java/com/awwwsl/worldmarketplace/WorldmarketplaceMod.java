@@ -2,15 +2,13 @@ package com.awwwsl.worldmarketplace;
 
 import com.awwwsl.worldmarketplace.blocks.*;
 import com.awwwsl.worldmarketplace.display.ChequeMachineMenu;
+import com.awwwsl.worldmarketplace.display.CommunityCenterMenu;
 import com.awwwsl.worldmarketplace.display.InboxMenu;
 import com.awwwsl.worldmarketplace.display.MarketMenu;
-import com.awwwsl.worldmarketplace.display.VirtualChestScreen;
 import com.awwwsl.worldmarketplace.items.ChequeItem;
 import com.awwwsl.worldmarketplace.items.CommunityCenterBlockItem;
 import com.awwwsl.worldmarketplace.items.PackageSellingItem;
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
@@ -18,8 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -34,9 +30,7 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -102,6 +96,7 @@ public class WorldmarketplaceMod {
     public static final RegistryObject<MenuType<MarketMenu>> MARKET_MENU_TYPE = MENU_TYPES.register("market_menu_type", () -> IForgeMenuType.create(MarketMenu::new));
     public static final RegistryObject<MenuType<ChequeMachineMenu>> CHEQUE_MACHINE_MENU_TYPE = MENU_TYPES.register("cheque_machine_menu_type", () -> IForgeMenuType.create(ChequeMachineMenu::new));
     public static final RegistryObject<MenuType<InboxMenu>> INBOX_MENU_TYPE = MENU_TYPES.register("inbox_menu_type", () -> IForgeMenuType.create(InboxMenu::new));
+    public static final RegistryObject<MenuType<CommunityCenterMenu>> COMMUNITY_CENTER_MENU_TYPE = MENU_TYPES.register("community_center_menu_type", () -> IForgeMenuType.create(CommunityCenterMenu::new));
 
     public static final RegistryObject<CreativeModeTab> MOD_CREATIVE_MODE_TAB = CREATIVE_MODE_TABS.register("creative_tab", () ->
             CreativeModeTab.builder()
@@ -124,21 +119,11 @@ public class WorldmarketplaceMod {
         MENU_TYPES.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        // ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, ModConfig.SPEC);
         modEventBus.register(this);
 
-        ModNetwork.register();;
+        ModNetwork.register();
     }
 
-    @SubscribeEvent
-    public void onClientSetup(FMLClientSetupEvent event) {
-        MenuScreens.register(MARKET_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
-        MenuScreens.register(CHEQUE_MACHINE_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 1));
-        MenuScreens.register(INBOX_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
-
-        BlockEntityRenderers.register(COMMUNITY_CENTER_BLOCK_ENTITY.get(), CommuniyCenterBlockEntity.Renderer::new);
-    }
     public static class Utils {
         @SuppressWarnings("deprecation")
         public static @NotNull StructureStart queryCenter(ServerLevel level, BlockPos blockPos) {

@@ -30,7 +30,7 @@ public class InboxMenu extends AbstractContainerMenu {
     private final Market market;
 
     public InboxMenu(int containerId, Inventory inv, Market market) {
-        super(WorldmarketplaceMod.MARKET_MENU_TYPE.get(), containerId);
+        super(WorldmarketplaceMod.INBOX_MENU_TYPE.get(), containerId);
         this.market = market;
         Container container = new SimpleContainer(54);
         for(int i = 0; i < market.items().size(); i++) {

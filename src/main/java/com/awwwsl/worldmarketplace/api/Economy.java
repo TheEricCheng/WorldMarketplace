@@ -2,8 +2,6 @@ package com.awwwsl.worldmarketplace.api;
 
 import com.awwwsl.worldmarketplace.ModNetwork;
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
-import com.awwwsl.worldmarketplace.blocks.CommuniyCenterBlockEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,11 +11,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = WorldmarketplaceMod.MOD_ID)
@@ -97,39 +93,34 @@ public class Economy {
     public static class Packet {
         @NotNull
         private final BigDecimal balance;
+
         public Packet(@NotNull BigDecimal balance) {
             this.balance = balance;
         }
-        public Packet(@NotNull CompoundTag data) {
-            this.balance = new BigDecimal(data.getString("balance"));
-        }
 
         public Packet(@NotNull FriendlyByteBuf buf) {
-            var data = buf.readNbt();
-            if (data == null) {
-                throw new IllegalArgumentException("Data cannot be null");
-            }
+            CompoundTag data = buf.readNbt();
+            if (data == null) throw new IllegalArgumentException("Data cannot be null");
             this.balance = new BigDecimal(data.getString("balance"));
         }
 
         public void encode(@NotNull FriendlyByteBuf buf) {
-            var data = new CompoundTag();
+            CompoundTag data = new CompoundTag();
             data.putString("balance", balance.toString());
             buf.writeNbt(data);
         }
 
         public void handle(Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
-                Minecraft mc = Minecraft.getInstance();
-                Player localPlayer = mc.player;
-                if (localPlayer != null) {
-                    setBalance(localPlayer, balance);
+                // 这里不要直接处理客户端逻辑
+                if (ctx.get().getDirection().getReceptionSide().isClient()) {
+                    // 只调用客户端处理器
+                    com.awwwsl.worldmarketplace.client.ClientEconomyPacketHandler.handle(balance);
                 }
             });
             ctx.get().setPacketHandled(true);
         }
     }
-
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;

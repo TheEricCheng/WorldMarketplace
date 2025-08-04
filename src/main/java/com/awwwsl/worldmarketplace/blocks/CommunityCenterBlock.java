@@ -1,16 +1,29 @@
 package com.awwwsl.worldmarketplace.blocks;
 
+import com.awwwsl.worldmarketplace.MarketSavedData;
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
+import com.awwwsl.worldmarketplace.api.Market;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.extensions.IForgeBlock;
+import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +54,7 @@ public class CommunityCenterBlock extends CommonHorizontalDirectionalBlock imple
         return 0;
     }
 
+
     @Override
     public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
         return new CommuniyCenterBlockEntity(blockPos, blockState);
@@ -66,5 +80,37 @@ public class CommunityCenterBlock extends CommonHorizontalDirectionalBlock imple
                 }
             }
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public @NotNull InteractionResult use(@NotNull BlockState blockState,
+                                          @NotNull Level level,
+                                          @NotNull BlockPos blockPos,
+                                          @NotNull Player player,
+                                          @NotNull InteractionHand interactionHand,
+                                          @NotNull BlockHitResult blockHitResult) {
+        if(!level.isClientSide) {
+            ServerLevel serverLevel = (ServerLevel) level;
+            ChunkPos center = WorldmarketplaceMod.Utils.queryCenter(serverLevel, blockPos).getChunkPos();
+            Market market = MarketSavedData.get(serverLevel).getMarket(serverLevel, center);
+            BlockEntity blockEntity = serverLevel.getBlockEntity(blockPos);
+            if(blockEntity instanceof CommuniyCenterBlockEntity communiyCenterBlockEntity) {
+                if (market == null) {
+                    player.playNotifySound(SoundEvents.VILLAGER_NO, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    player.sendSystemMessage(Component.literal("This community center is not bind to a market"));
+                }
+
+                if(market != null) {
+                    NetworkHooks.openScreen((ServerPlayer) player, communiyCenterBlockEntity, buf -> {
+                        var tag = new CompoundTag();
+                        market.save(tag);
+                        buf.writeNbt(tag);
+                    });
+                }
+            }
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+
     }
 }
