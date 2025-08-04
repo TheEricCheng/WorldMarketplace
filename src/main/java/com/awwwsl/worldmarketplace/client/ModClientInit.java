@@ -1,6 +1,6 @@
 package com.awwwsl.worldmarketplace.client;
 
-import com.awwwsl.worldmarketplace.blocks.CommuniyCenterBlockEntity;
+import com.awwwsl.worldmarketplace.blocks.CommunityCenterBlockEntity;
 import com.awwwsl.worldmarketplace.display.VirtualChestScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.network.chat.Component;
@@ -23,6 +23,6 @@ public class ModClientInit {
         MenuScreens.register(INBOX_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
         MenuScreens.register(COMMUNITY_CENTER_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
 
-        net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(COMMUNITY_CENTER_BLOCK_ENTITY.get(), CommuniyCenterBlockEntity.Renderer::new);
+        net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(COMMUNITY_CENTER_BLOCK_ENTITY.get(), CommunityCenterBlockEntity.Renderer::new);
     }
 }

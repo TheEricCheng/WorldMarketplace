@@ -1,20 +1,12 @@
 package com.awwwsl.worldmarketplace.blocks;
 
-import com.awwwsl.worldmarketplace.MarketSavedData;
-import com.awwwsl.worldmarketplace.ModConfig;
 import com.awwwsl.worldmarketplace.display.MarketMenu;
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import com.awwwsl.worldmarketplace.api.Economy;
 import com.awwwsl.worldmarketplace.api.Market;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -22,11 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.structure.Structure;
-import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -38,9 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider {
-    private ChunkPos center;
-
+public class ShipmentBoxBlockEntity extends MarketBlockEntity implements MenuProvider {
     public ShipmentBoxBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(WorldmarketplaceMod.SHIPMENT_BOX_BLOCK_ENTITY.get(), blockPos, blockState);
     }
@@ -55,36 +41,6 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
                 : super.getCapability(cap, side);
     }
 
-    public void generateMarket(ServerLevel level, StructureStart start) {
-        if (start == StructureStart.INVALID_START) {
-            throw new IllegalArgumentException("Invalid structure start provided");
-        }
-        var worldDefaults = ModConfig.getWorldMarket(level.getServer());
-        var defaults = worldDefaults.markets();
-        Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
-        var optFirst = defaults.stream().filter(
-            e -> e.location().equals(registry.getKey(start.getStructure()))
-        ).findFirst();
-        if (optFirst.isPresent()) {
-            var first = optFirst.orElseThrow();
-            var savedData = MarketSavedData.get(level);
-            var market = savedData.getMarket(level, start.getChunkPos());
-            if (market == null) {
-                var itemRegistry = level.getServer().registryAccess().registryOrThrow(Registries.ITEM);
-                market = Market.newFromDefaultsFilter(first, marketItem -> {
-                    if (itemRegistry.getOptional(marketItem.id).isEmpty()) {
-                        WorldmarketplaceMod.LOGGER.warn("Market item {} not found in registry, skipping", marketItem.id);
-                        return false; // Skip items not found in registry
-                    }
-                    return true;
-                });
-                savedData.saveMarket(level, start.getChunkPos(), market);
-            }
-            this.center = start.getChunkPos();
-        }
-        setChanged();
-    }
-
     @Override
     public @NotNull Component getDisplayName() {
         return Component.literal("ShipmentBox");
@@ -93,33 +49,6 @@ public class ShipmentBoxBlockEntity extends BlockEntity implements MenuProvider 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int id, @NotNull Inventory inventory, @NotNull Player player) {
         return new MarketMenu(id, inventory, Objects.requireNonNull(this.getMarket()));
-    }
-
-    public @Nullable Market getMarket() {
-        if(this.level instanceof ServerLevel serverLevel) {
-            return MarketSavedData.get(serverLevel).getMarket(serverLevel, this.center);
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
-        super.saveAdditional(tag);
-        save(tag);
-    }
-    public CompoundTag save(@NotNull CompoundTag tag) {
-        if (this.center != null) {
-            tag.putInt("chunkX", this.center.x);
-            tag.putInt("chunkZ", this.center.z);
-        }
-        return tag;
-    }
-
-    @Override
-    public void load(@NotNull CompoundTag tag) {
-        super.load(tag);
-        this.center = new ChunkPos(tag.getInt("chunkX"), tag.getInt("chunkZ"));
     }
 }
 
@@ -205,6 +134,4 @@ class ShipmentBoxItemHandler implements IItemHandler {
             return false;
         }
     }
-
-
 }

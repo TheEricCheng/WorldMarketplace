@@ -4,7 +4,6 @@ import com.awwwsl.worldmarketplace.MarketSavedData;
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import com.awwwsl.worldmarketplace.api.Market;
 import com.awwwsl.worldmarketplace.display.CommunityCenterMenu;
-import com.awwwsl.worldmarketplace.display.InboxMenu;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,7 +23,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -34,15 +32,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public class CommuniyCenterBlockEntity extends BlockEntity implements MenuProvider {
+public class CommunityCenterBlockEntity extends MarketBlockEntity implements MenuProvider {
 
     @SuppressWarnings("NotNullFieldNotInitialized")
     @NotNull
     private BlockPos center;
 
-    @NotNull
-    private ChunkPos marketCenter;
-    public CommuniyCenterBlockEntity(BlockPos blockPos, BlockState blockState) {
+    public CommunityCenterBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(WorldmarketplaceMod.COMMUNITY_CENTER_BLOCK_ENTITY.get(), blockPos, blockState);
     }
 
@@ -69,7 +65,7 @@ public class CommuniyCenterBlockEntity extends BlockEntity implements MenuProvid
 
     @Override
     public @NotNull CompoundTag getUpdateTag() {
-        var compound = new CompoundTag();
+        var compound = super.getUpdateTag();
         compound.putInt("centerX", center.getX());
         compound.putInt("centerY", center.getY());
         compound.putInt("centerZ", center.getZ());
@@ -81,6 +77,7 @@ public class CommuniyCenterBlockEntity extends BlockEntity implements MenuProvid
         int x = tag.getInt("centerX");
         int y = tag.getInt("centerY");
         int z = tag.getInt("centerZ");
+        super.handleUpdateTag(tag);
         this.center = new BlockPos(x, y, z);
     }
 
@@ -130,7 +127,7 @@ public class CommuniyCenterBlockEntity extends BlockEntity implements MenuProvid
         return Component.literal("Community Center");
     }
 
-    public static class Renderer implements BlockEntityRenderer<CommuniyCenterBlockEntity> {
+    public static class Renderer implements BlockEntityRenderer<CommunityCenterBlockEntity> {
 
         private final BlockEntityRendererProvider.Context context;
 
@@ -139,7 +136,7 @@ public class CommuniyCenterBlockEntity extends BlockEntity implements MenuProvid
         }
 
         @Override
-        public boolean shouldRender(@NotNull CommuniyCenterBlockEntity blockEntity, @NotNull Vec3 cameraPos) {
+        public boolean shouldRender(@NotNull CommunityCenterBlockEntity blockEntity, @NotNull Vec3 cameraPos) {
             if(blockEntity.center.equals(blockEntity.worldPosition)) {
                 return Vec3.atCenterOf(blockEntity.getBlockPos()).closerThan(cameraPos, this.getViewDistance());
             }
@@ -149,7 +146,7 @@ public class CommuniyCenterBlockEntity extends BlockEntity implements MenuProvid
         }
 
         @Override
-        public void render(@NotNull CommuniyCenterBlockEntity be, float partialTicks, PoseStack poseStack,
+        public void render(@NotNull CommunityCenterBlockEntity be, float partialTicks, PoseStack poseStack,
                            @NotNull MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
             poseStack.pushPose();
 

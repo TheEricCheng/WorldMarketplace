@@ -67,7 +67,7 @@ public class InboxBlock extends CommonHorizontalDirectionalBlock implements Enti
             if (blockEntity instanceof InboxBlockEntity inboxBlockEntity) {
                 var center = WorldmarketplaceMod.Utils.queryCenter(serverLevel, blockPos);
                 if(center != StructureStart.INVALID_START) {
-                    inboxBlockEntity.generateMarket(serverLevel, center);
+                    inboxBlockEntity.initializeMarket(serverLevel, center);
                 }
             }
         }
@@ -91,9 +91,7 @@ public class InboxBlock extends CommonHorizontalDirectionalBlock implements Enti
 
                 if(inboxBlockEntity.getMarket() != null) {
                     NetworkHooks.openScreen((ServerPlayer) player, inboxBlockEntity, buf -> {
-                        var tag = new CompoundTag();
-                        inboxBlockEntity.saveAdditional(tag);
-                        buf.writeNbt(tag);
+                        buf.writeNbt(inboxBlockEntity.writeMarket());
                     });
                 }
             }

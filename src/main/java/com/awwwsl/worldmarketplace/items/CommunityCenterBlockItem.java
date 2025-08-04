@@ -1,7 +1,7 @@
 package com.awwwsl.worldmarketplace.items;
 
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
-import com.awwwsl.worldmarketplace.blocks.CommuniyCenterBlockEntity;
+import com.awwwsl.worldmarketplace.blocks.CommunityCenterBlockEntity;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -12,7 +12,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -153,7 +152,7 @@ public class CommunityCenterBlockItem extends BlockItem {
                 }
 
                 BlockEntity be = level.getBlockEntity(checking);
-                if(be instanceof CommuniyCenterBlockEntity blockEntity) {
+                if(be instanceof CommunityCenterBlockEntity blockEntity) {
                     blockEntity.setCenter(origin);
                 } else {
                     WorldmarketplaceMod.LOGGER.warn("Failed to place Community Center Block Entity at {}", checking);

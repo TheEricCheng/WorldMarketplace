@@ -57,7 +57,7 @@ public class CommunityCenterBlock extends CommonHorizontalDirectionalBlock imple
 
     @Override
     public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
-        return new CommuniyCenterBlockEntity(blockPos, blockState);
+        return new CommunityCenterBlockEntity(blockPos, blockState);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class CommunityCenterBlock extends CommonHorizontalDirectionalBlock imple
         super.playerWillDestroy(level, blockPos, blockState, player);
         if(level.isClientSide) return;
         var entity = level.getBlockEntity(blockPos);
-        if(entity instanceof CommuniyCenterBlockEntity centerEntity) {
+        if(entity instanceof CommunityCenterBlockEntity centerEntity) {
             var center = centerEntity.getCenter();
             var facing = blockState.getValue(FACING);
             var right = facing.getClockWise();
@@ -85,32 +85,26 @@ public class CommunityCenterBlock extends CommonHorizontalDirectionalBlock imple
     @SuppressWarnings("deprecation")
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState blockState,
-                                          @NotNull Level level,
+                                          Level level,
                                           @NotNull BlockPos blockPos,
                                           @NotNull Player player,
-                                          @NotNull InteractionHand interactionHand,
-                                          @NotNull BlockHitResult blockHitResult) {
+                                          @NotNull InteractionHand hand,
+                                          @NotNull BlockHitResult hitResult) {
         if(!level.isClientSide) {
-            ServerLevel serverLevel = (ServerLevel) level;
-            ChunkPos center = WorldmarketplaceMod.Utils.queryCenter(serverLevel, blockPos).getChunkPos();
-            Market market = MarketSavedData.get(serverLevel).getMarket(serverLevel, center);
-            BlockEntity blockEntity = serverLevel.getBlockEntity(blockPos);
-            if(blockEntity instanceof CommuniyCenterBlockEntity communiyCenterBlockEntity) {
-                if (market == null) {
+            BlockEntity blockEntity = level.getBlockEntity(blockPos);
+            if(blockEntity instanceof CommunityCenterBlockEntity communityCenterBlockEntity) {
+                if (communityCenterBlockEntity.getMarket() == null) {
                     player.playNotifySound(SoundEvents.VILLAGER_NO, SoundSource.BLOCKS, 1.0F, 1.0F);
                     player.sendSystemMessage(Component.literal("This community center is not bind to a market"));
                 }
 
-                if(market != null) {
-                    NetworkHooks.openScreen((ServerPlayer) player, communiyCenterBlockEntity, buf -> {
-                        var tag = new CompoundTag();
-                        market.save(tag);
-                        buf.writeNbt(tag);
+                if(communityCenterBlockEntity.getMarket() != null) {
+                    NetworkHooks.openScreen((ServerPlayer) player, communityCenterBlockEntity, buf -> {
+                        buf.writeNbt(communityCenterBlockEntity.writeMarket());
                     });
                 }
             }
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
-
     }
 }

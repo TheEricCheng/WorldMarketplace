@@ -68,10 +68,7 @@ public class ShipmentBoxBlock extends CommonHorizontalDirectionalBlock implement
             ServerLevel serverLevel = (ServerLevel) level;
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity instanceof ShipmentBoxBlockEntity shipmentBoxBlockEntity) {
-                var center = WorldmarketplaceMod.Utils.queryCenter(serverLevel, blockPos);
-                if(center != StructureStart.INVALID_START) {
-                    shipmentBoxBlockEntity.generateMarket(serverLevel, center);
-                }
+                shipmentBoxBlockEntity.initializeMarket(serverLevel);
             }
         }
     }
@@ -95,8 +92,7 @@ public class ShipmentBoxBlock extends CommonHorizontalDirectionalBlock implement
 
                 if(shipmentBoxBlockEntity.getMarket() != null) {
                     NetworkHooks.openScreen((ServerPlayer) player, shipmentBoxBlockEntity, buf -> {
-                        var tag = new CompoundTag();
-                        buf.writeNbt(shipmentBoxBlockEntity.save(tag));
+                        buf.writeNbt(shipmentBoxBlockEntity.writeMarket());
                     });
                 }
             }

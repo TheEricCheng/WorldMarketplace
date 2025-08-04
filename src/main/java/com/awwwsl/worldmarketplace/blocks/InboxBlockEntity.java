@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class InboxBlockEntity extends BlockEntity implements MenuProvider {
+public class InboxBlockEntity extends MarketBlockEntity implements MenuProvider {
     public @NotNull BigDecimal getValue() {
         return value;
     }
@@ -57,18 +57,13 @@ public class InboxBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     public void load(@NotNull CompoundTag compoundTag) {
         var valueStr = compoundTag.getString("value");
-        var centerX = compoundTag.getInt("centerX");
-        var centerZ = compoundTag.getInt("centerZ");
         this.value = new BigDecimal(valueStr);
-        this.center = new ChunkPos(centerX, centerZ);
         super.load(compoundTag);
     }
 
     @Override
     protected void saveAdditional(@NotNull CompoundTag compoundTag) {
         compoundTag.putString("value", value.toString());
-        compoundTag.putInt("centerX", center.x);
-        compoundTag.putInt("centerZ", center.z);
         super.saveAdditional(compoundTag);
     }
 
@@ -81,47 +76,6 @@ public class InboxBlockEntity extends BlockEntity implements MenuProvider {
     public @Nullable AbstractContainerMenu createMenu(int containerId, @NotNull Inventory inventory, @NotNull Player player) {
         return new InboxMenu(containerId, inventory, Objects.requireNonNull(this.getMarket()));
     }
-
-    public @Nullable Market getMarket() {
-        if(this.level instanceof ServerLevel serverLevel) {
-            return MarketSavedData.get(serverLevel).getMarket(serverLevel, this.center);
-        } else {
-            return null;
-        }
-    }
-
-    // same as ShipmentBoxBlockEntity::generateMarket
-    public void generateMarket(ServerLevel level, StructureStart start) {
-        if (start == StructureStart.INVALID_START) {
-            throw new IllegalArgumentException("Invalid structure start provided");
-        }
-        var worldDefaults = ModConfig.getWorldMarket(level.getServer());
-        var defaults = worldDefaults.markets();
-        Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
-        var optFirst = defaults.stream().filter(
-            e -> e.location().equals(registry.getKey(start.getStructure()))
-        ).findFirst();
-        if (optFirst.isPresent()) {
-            var first = optFirst.orElseThrow();
-            var savedData = MarketSavedData.get(level);
-            var market = savedData.getMarket(level, start.getChunkPos());
-            if (market == null) {
-                var itemRegistry = level.getServer().registryAccess().registryOrThrow(Registries.ITEM);
-                market = Market.newFromDefaultsFilter(first, marketItem -> {
-                    if (itemRegistry.getOptional(marketItem.id).isEmpty()) {
-                        WorldmarketplaceMod.LOGGER.warn("Market item {} not found in registry, skipping", marketItem.id);
-                        return false; // Skip items not found in registry
-                    }
-                    return true;
-                });
-                savedData.saveMarket(level, start.getChunkPos(), market);
-            }
-            this.center = start.getChunkPos();
-        }
-        setChanged();
-    }
-
-    /// StructureStart.INVALID_START for when no structure is found
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {

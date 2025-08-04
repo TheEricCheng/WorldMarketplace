@@ -88,7 +88,7 @@ public class WorldmarketplaceMod {
     public static final RegistryObject<Block> COMMUNITY_CENTER_BLOCK = BLOCKS.register("community_center", CommunityCenterBlock::new);
     public static final RegistryObject<Item> COMMUNITY_CENTER_BLOCK_ITEM = ITEMS.register("community_center", CommunityCenterBlockItem::new);
     @SuppressWarnings("DataFlowIssue")
-    public static final RegistryObject<BlockEntityType<CommuniyCenterBlockEntity>> COMMUNITY_CENTER_BLOCK_ENTITY = BLOCK_ENTITIES.register("community_center_block_entity", () -> BlockEntityType.Builder.of(CommuniyCenterBlockEntity::new, COMMUNITY_CENTER_BLOCK.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CommunityCenterBlockEntity>> COMMUNITY_CENTER_BLOCK_ENTITY = BLOCK_ENTITIES.register("community_center_block_entity", () -> BlockEntityType.Builder.of(CommunityCenterBlockEntity::new, COMMUNITY_CENTER_BLOCK.get()).build(null));
 
     public static final RegistryObject<Item> PACKAGE_SELLING_ITEM = ITEMS.register("package_selling_item", PackageSellingItem::new);
     public static final RegistryObject<Item> CHEQUE_ITEM = ITEMS.register("cheque", ChequeItem::new);
