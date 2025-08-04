@@ -10,6 +10,7 @@ import com.awwwsl.worldmarketplace.items.CommunityCenterBlockItem;
 import com.awwwsl.worldmarketplace.items.PackageSellingItem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
@@ -135,6 +136,8 @@ public class WorldmarketplaceMod {
         MenuScreens.register(MARKET_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
         MenuScreens.register(CHEQUE_MACHINE_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 1));
         MenuScreens.register(INBOX_MENU_TYPE.get(), (AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
+
+        BlockEntityRenderers.register(COMMUNITY_CENTER_BLOCK_ENTITY.get(), CommuniyCenterBlockEntity.Renderer::new);
     }
     public static class Utils {
         @SuppressWarnings("deprecation")

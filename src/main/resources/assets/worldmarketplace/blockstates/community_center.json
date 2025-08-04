@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "worldmarketplace:block/community_center" },
+        "facing=south": { "model": "worldmarketplace:block/community_center", "y": 180 },
+        "facing=west":  { "model": "worldmarketplace:block/community_center", "y": 270 },
+        "facing=east":  { "model": "worldmarketplace:block/community_center", "y": 90 }
+    }
+}

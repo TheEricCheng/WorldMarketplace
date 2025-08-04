@@ -7,14 +7,21 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.extensions.IForgeBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CommunityCenterBlock extends CommonHorizontalDirectionalBlock implements EntityBlock {
+public class CommunityCenterBlock extends CommonHorizontalDirectionalBlock implements EntityBlock, IForgeBlock {
     public CommunityCenterBlock() {
         super(Properties.copy(Blocks.OAK_WOOD).noOcclusion());
+    }
+
+    @Override
+    public @NotNull RenderShape getRenderShape(@NotNull BlockState p_60550_) {
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
     @Override
