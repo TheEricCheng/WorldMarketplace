@@ -9,6 +9,7 @@ import java.util.Objects;
 
 public record MarketItemDefaults (
     ResourceLocation item,
+    MarketItemType type,
     int level,
     BigDecimal basePrice,
     BigDecimal offset
@@ -24,11 +25,13 @@ public record MarketItemDefaults (
         var offsetStr = config.<String>get("offset");
         Objects.requireNonNull(offsetStr);
         var offset = offsetStr.isEmpty() ? BigDecimal.ZERO : new BigDecimal(offsetStr);
-        return new MarketItemDefaults(location1, level, basePrice, offset);
+        var type = MarketItemType.fromConfig(config);
+        return new MarketItemDefaults(location1, type, level, basePrice, offset);
     }
 
     public void toConfig(@NotNull Config config) {
         config.add("resourceLocation", item.toString());
+        config.add("type", type.name().toLowerCase());
         config.add("level", level);
         config.add("basePrice", basePrice.toString());
         config.add("offset", offset.toString());

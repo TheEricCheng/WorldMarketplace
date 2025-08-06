@@ -1,6 +1,6 @@
 package com.awwwsl.worldmarketplace.blocks;
 
-import com.awwwsl.worldmarketplace.display.MarketMenu;
+import com.awwwsl.worldmarketplace.display.ShipmentBoxMenu;
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import com.awwwsl.worldmarketplace.api.Economy;
 import com.awwwsl.worldmarketplace.api.Market;
@@ -48,7 +48,7 @@ public class ShipmentBoxBlockEntity extends MarketBlockEntity implements MenuPro
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int id, @NotNull Inventory inventory, @NotNull Player player) {
-        return new MarketMenu(id, inventory, Objects.requireNonNull(this.getMarket()));
+        return new ShipmentBoxMenu(id, inventory, Objects.requireNonNull(this.getMarket()));
     }
 }
 

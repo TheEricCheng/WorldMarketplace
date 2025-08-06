@@ -3,6 +3,7 @@ package com.awwwsl.worldmarketplace.display;
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
 import com.awwwsl.worldmarketplace.api.Economy;
 import com.awwwsl.worldmarketplace.api.Market;
+import com.awwwsl.worldmarketplace.api.MarketItemType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -33,8 +34,11 @@ public class InboxMenu extends AbstractContainerMenu {
         super(WorldmarketplaceMod.INBOX_MENU_TYPE.get(), containerId);
         this.market = market;
         Container container = new SimpleContainer(54);
-        for(int i = 0; i < market.items().size(); i++) {
-            var marketItem = market.items().get(i);
+        var items = market.items().stream()
+                .filter(e -> e.type == MarketItemType.BUY || e.type == MarketItemType.BOTH)
+                .toList();
+        for(int i = 0; i < items.size(); i++) {
+            var marketItem = items.get(i);
             var displayItem = ForgeRegistries.ITEMS.getValue(marketItem.id);
             if(displayItem == null || displayItem == Items.AIR) {
                 displayItem = Items.BARRIER;

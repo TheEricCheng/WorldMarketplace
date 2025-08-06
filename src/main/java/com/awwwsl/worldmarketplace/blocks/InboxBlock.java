@@ -65,10 +65,7 @@ public class InboxBlock extends CommonHorizontalDirectionalBlock implements Enti
             ServerLevel serverLevel = (ServerLevel) level;
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity instanceof InboxBlockEntity inboxBlockEntity) {
-                var center = WorldmarketplaceMod.Utils.queryCenter(serverLevel, blockPos);
-                if(center != StructureStart.INVALID_START) {
-                    inboxBlockEntity.initializeMarket(serverLevel, center);
-                }
+                inboxBlockEntity.initializeMarket(serverLevel);
             }
         }
     }

@@ -18,7 +18,7 @@ import static com.awwwsl.worldmarketplace.WorldmarketplaceMod.*;
 public class ModClientInit {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        MenuScreens.register(MARKET_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
+        MenuScreens.register(SHIPMENT_BOX_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
         MenuScreens.register(CHEQUE_MACHINE_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 1));
         MenuScreens.register(INBOX_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
         MenuScreens.register(COMMUNITY_CENTER_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));

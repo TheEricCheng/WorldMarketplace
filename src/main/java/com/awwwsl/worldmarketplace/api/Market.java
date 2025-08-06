@@ -23,7 +23,7 @@ public record Market(
         return new Market(
             defaults.location(),
             defaults.marketItems().stream()
-                    .map(e -> new MarketItem(e.item(), e.basePrice(), e.offset()))
+                    .map(e -> new MarketItem(e.item(), e.type(), e.basePrice(), e.offset()))
                     .toList()
         );
     }
@@ -35,7 +35,7 @@ public record Market(
         return new Market(
             defaults.location(),
             defaults.marketItems().stream()
-                    .map(e -> new MarketItem(e.item(), e.basePrice(), e.offset()))
+                    .map(e -> new MarketItem(e.item(), e.type(), e.basePrice(), e.offset()))
                     .filter(filter)
                     .toList()
         );

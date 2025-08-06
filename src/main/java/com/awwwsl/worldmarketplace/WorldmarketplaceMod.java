@@ -4,7 +4,7 @@ import com.awwwsl.worldmarketplace.blocks.*;
 import com.awwwsl.worldmarketplace.display.ChequeMachineMenu;
 import com.awwwsl.worldmarketplace.display.CommunityCenterMenu;
 import com.awwwsl.worldmarketplace.display.InboxMenu;
-import com.awwwsl.worldmarketplace.display.MarketMenu;
+import com.awwwsl.worldmarketplace.display.ShipmentBoxMenu;
 import com.awwwsl.worldmarketplace.items.ChequeItem;
 import com.awwwsl.worldmarketplace.items.CommunityCenterBlockItem;
 import com.awwwsl.worldmarketplace.items.PackageSellingItem;
@@ -93,7 +93,7 @@ public class WorldmarketplaceMod {
     public static final RegistryObject<Item> PACKAGE_SELLING_ITEM = ITEMS.register("package_selling_item", PackageSellingItem::new);
     public static final RegistryObject<Item> CHEQUE_ITEM = ITEMS.register("cheque", ChequeItem::new);
 
-    public static final RegistryObject<MenuType<MarketMenu>> MARKET_MENU_TYPE = MENU_TYPES.register("market_menu_type", () -> IForgeMenuType.create(MarketMenu::new));
+    public static final RegistryObject<MenuType<ShipmentBoxMenu>> SHIPMENT_BOX_MENU_TYPE = MENU_TYPES.register("shipment_box_menu_type", () -> IForgeMenuType.create(ShipmentBoxMenu::new));
     public static final RegistryObject<MenuType<ChequeMachineMenu>> CHEQUE_MACHINE_MENU_TYPE = MENU_TYPES.register("cheque_machine_menu_type", () -> IForgeMenuType.create(ChequeMachineMenu::new));
     public static final RegistryObject<MenuType<InboxMenu>> INBOX_MENU_TYPE = MENU_TYPES.register("inbox_menu_type", () -> IForgeMenuType.create(InboxMenu::new));
     public static final RegistryObject<MenuType<CommunityCenterMenu>> COMMUNITY_CENTER_MENU_TYPE = MENU_TYPES.register("community_center_menu_type", () -> IForgeMenuType.create(CommunityCenterMenu::new));
@@ -157,7 +157,7 @@ public class WorldmarketplaceMod {
                         aabb.encapsulate(piece.getBoundingBox());
                     }
                     assert aabb != null;
-                    aabb = scaleBoundingBox(aabb, 0.4, 3);
+//                    aabb = scaleBoundingBox(aabb, 0.4, 3);
                     WorldmarketplaceMod.LOGGER.debug("Structure {} found at {}, AABB: {}", structure, possibleStart.getChunkPos(), aabb);
                     if(aabb.isInside(blockPos)){
                         start = possibleStart;

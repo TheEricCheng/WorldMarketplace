@@ -12,7 +12,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -78,6 +80,17 @@ public class CommunityCenterBlock extends CommonHorizontalDirectionalBlock imple
                         level.destroyBlock(pos, false);
                     }
                 }
+            }
+        }
+    }
+
+    @Override
+    public void setPlacedBy(@NotNull Level level, @NotNull BlockPos blockPos, @NotNull BlockState blockState, @Nullable LivingEntity placer, @NotNull ItemStack itemStack) {
+        if(!level.isClientSide) {
+            ServerLevel serverLevel = (ServerLevel) level;
+            BlockEntity blockEntity = level.getBlockEntity(blockPos);
+            if (blockEntity instanceof CommunityCenterBlockEntity communityCenterBlockEntity) {
+                communityCenterBlockEntity.initializeMarket(serverLevel);
             }
         }
     }

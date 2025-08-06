@@ -32,10 +32,10 @@ public record WorldMarketDefaults(List<MarketDefaults> markets) {
     }
 
     public static WorldMarketDefaults DEFAULT = new WorldMarketDefaults(List.of(
-            MarketDefaults.VILLAGE_PLAINS,
-            MarketDefaults.VILLAGE_DESERT,
-            MarketDefaults.VILLAGE_SAVANNA,
-            MarketDefaults.VILLAGE_SNOWY,
-            MarketDefaults.VILLAGE_TAIGA
+//            MarketDefaults.VILLAGE_PLAINS,
+//            MarketDefaults.VILLAGE_DESERT,
+//            MarketDefaults.VILLAGE_SAVANNA,
+//            MarketDefaults.VILLAGE_SNOWY,
+//            MarketDefaults.VILLAGE_TAIGA
     ));
 }
