@@ -20,7 +20,6 @@ public class ChequeMachineBlockEntity extends BlockEntity implements MenuProvide
         super(WorldmarketplaceMod.CHEQUE_MACHINE_BLOCK_ENTITY.get(), blockPos, blockState);
     }
 
-
     @Override
     public @NotNull Component getDisplayName() {
         return Component.literal("ChequeMachine");

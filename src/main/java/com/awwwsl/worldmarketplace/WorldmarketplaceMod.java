@@ -1,12 +1,10 @@
 package com.awwwsl.worldmarketplace;
 
 import com.awwwsl.worldmarketplace.blocks.*;
-import com.awwwsl.worldmarketplace.display.ChequeMachineMenu;
-import com.awwwsl.worldmarketplace.display.CommunityCenterMenu;
-import com.awwwsl.worldmarketplace.display.InboxMenu;
-import com.awwwsl.worldmarketplace.display.ShipmentBoxMenu;
+import com.awwwsl.worldmarketplace.display.*;
 import com.awwwsl.worldmarketplace.items.ChequeItem;
 import com.awwwsl.worldmarketplace.items.CommunityCenterBlockItem;
+import com.awwwsl.worldmarketplace.items.MarketTerminalItem;
 import com.awwwsl.worldmarketplace.items.PackageSellingItem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
@@ -90,6 +88,11 @@ public class WorldmarketplaceMod {
     @SuppressWarnings("DataFlowIssue")
     public static final RegistryObject<BlockEntityType<CommunityCenterBlockEntity>> COMMUNITY_CENTER_BLOCK_ENTITY = BLOCK_ENTITIES.register("community_center_block_entity", () -> BlockEntityType.Builder.of(CommunityCenterBlockEntity::new, COMMUNITY_CENTER_BLOCK.get()).build(null));
 
+    public static final RegistryObject<Block> MARKET_TERMINAL_BLOCK = BLOCKS.register("market_terminal", MarketTerminalBlock::new);
+    public static final RegistryObject<Item> MARKET_TERMINAL_BLOCK_ITEM = ITEMS.register("market_terminal", MarketTerminalItem::new);
+    @SuppressWarnings("DataFlowIssue")
+    public static final RegistryObject<BlockEntityType<MarketTerminalBlockEntity>> MARKET_TERMINAL_BLOCK_ENTITY = BLOCK_ENTITIES.register("market_terminal_block_entity", () -> BlockEntityType.Builder.of(MarketTerminalBlockEntity::new, MARKET_TERMINAL_BLOCK.get()).build(null));
+
     public static final RegistryObject<Item> PACKAGE_SELLING_ITEM = ITEMS.register("package_selling_item", PackageSellingItem::new);
     public static final RegistryObject<Item> CHEQUE_ITEM = ITEMS.register("cheque", ChequeItem::new);
 
@@ -97,6 +100,7 @@ public class WorldmarketplaceMod {
     public static final RegistryObject<MenuType<ChequeMachineMenu>> CHEQUE_MACHINE_MENU_TYPE = MENU_TYPES.register("cheque_machine_menu_type", () -> IForgeMenuType.create(ChequeMachineMenu::new));
     public static final RegistryObject<MenuType<InboxMenu>> INBOX_MENU_TYPE = MENU_TYPES.register("inbox_menu_type", () -> IForgeMenuType.create(InboxMenu::new));
     public static final RegistryObject<MenuType<CommunityCenterMenu>> COMMUNITY_CENTER_MENU_TYPE = MENU_TYPES.register("community_center_menu_type", () -> IForgeMenuType.create(CommunityCenterMenu::new));
+    public static final RegistryObject<MenuType<MarketTerminalMenu>> MARKET_TERMINAL_MENU_TYPE = MENU_TYPES.register("market_terminal_menu_type", () -> IForgeMenuType.create(MarketTerminalMenu::new));
 
     public static final RegistryObject<CreativeModeTab> MOD_CREATIVE_MODE_TAB = CREATIVE_MODE_TABS.register("creative_tab", () ->
             CreativeModeTab.builder()

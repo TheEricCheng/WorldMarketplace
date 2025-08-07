@@ -22,6 +22,7 @@ public class ModClientInit {
         MenuScreens.register(CHEQUE_MACHINE_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 1));
         MenuScreens.register(INBOX_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
         MenuScreens.register(COMMUNITY_CENTER_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
+        MenuScreens.register(MARKET_TERMINAL_MENU_TYPE.get(), (net.minecraft.world.inventory.AbstractContainerMenu menu, Inventory inv, Component title) -> new VirtualChestScreen(menu, inv, title, 6));
 
         net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(COMMUNITY_CENTER_BLOCK_ENTITY.get(), CommunityCenterBlockEntity.Renderer::new);
     }
