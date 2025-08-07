@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
@@ -22,7 +23,7 @@ public class MarketSavedData extends SavedData {
         );
     }
 
-    public Market getMarket(@NotNull ServerLevel world, @NotNull ChunkPos pos) {
+    public @Nullable Market getMarket(@NotNull ServerLevel world, @NotNull ChunkPos pos) {
         MarketSavedData data = get(world);
         return data.markets.getOrDefault(pos, null);
     }

@@ -52,6 +52,10 @@ public record Market(
         return new Market(villageType, items.build());
     }
 
+    public @NotNull CompoundTag save() {
+        return save(new CompoundTag());
+    }
+
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
         tag.putString("villageType", villageType.toString());
         ListTag itemsList = new ListTag();

@@ -1,6 +1,13 @@
 package com.awwwsl.worldmarketplace.blocks;
 
+import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
+import com.awwwsl.worldmarketplace.display.MarketTerminalMenuProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -10,6 +17,8 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,6 +71,35 @@ public class MarketTerminalBlock extends CommonHorizontalDirectionalBlock implem
             if (!this.canSurvive(p_60509_, p_60510_, p_60511_)) {
                 p_60510_.destroyBlock(p_60511_, true);
             }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public @NotNull InteractionResult use(@NotNull BlockState blockState,
+                                          @NotNull Level level,
+                                          @NotNull BlockPos blockPos,
+                                          @NotNull Player player,
+                                          @NotNull InteractionHand hand,
+                                          @NotNull BlockHitResult hitResult) {
+        if (player instanceof ServerPlayer serverPlayer && !level.isClientSide) {
+            BlockEntity blockEntity = level.getBlockEntity(blockPos);
+            if (blockEntity instanceof MarketTerminalBlockEntity marketTerminalBlockEntity) {
+                var market = marketTerminalBlockEntity.getMarket();
+                if(market != null) {
+                    var provider = new MarketTerminalMenuProvider(market);
+                    NetworkHooks.openScreen(serverPlayer, provider, provider::clientMenu);
+                    return InteractionResult.sidedSuccess(level.isClientSide);
+                } else {
+                    serverPlayer.sendSystemMessage(Component.literal("This terminal is not bound to a market")); // TODO: translatable
+                    return InteractionResult.FAIL;
+                }
+            } else {
+                WorldmarketplaceMod.LOGGER.warn("MarketTerminalBlockEntity not found at position: {}", blockPos);
+                return InteractionResult.FAIL;
+            }
+        } else {
+            return InteractionResult.SUCCESS;
         }
     }
 }

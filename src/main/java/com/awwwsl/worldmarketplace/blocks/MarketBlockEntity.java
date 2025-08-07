@@ -135,6 +135,19 @@ public abstract class MarketBlockEntity extends BlockEntity {
     public CompoundTag writeMarket() {
         return writeMarket(new CompoundTag());
     }
+    public boolean tryWriteMarket() {
+        var tag = new CompoundTag();
+        return tryWriteMarket(tag);
+    }
+
+    public boolean tryWriteMarket(CompoundTag tag) {
+        var market = this.getMarket();
+        if (market == null) {
+            return false;
+        }
+        market.save(tag);
+        return true;
+    }
 
     public CompoundTag writeMarket(CompoundTag tag) {
         var market = this.getMarket();
