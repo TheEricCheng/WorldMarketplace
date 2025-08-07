@@ -19,6 +19,7 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -48,8 +49,8 @@ public class MarketTerminalItem extends BlockItem {
             var pos = useOnContext.getClickedPos();
             var level = useOnContext.getLevel();
             var player = useOnContext.getPlayer();
+            var blockEntity = level.getBlockEntity(pos);
             if(level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer && !serverLevel.isClientSide) {
-                var blockEntity = serverLevel.getBlockEntity(pos);
                 if(blockEntity instanceof MarketBlockEntity marketBlockEntity) {
                     if(marketBlockEntity.getMarket() == null) {
                         player.displayClientMessage(Component.translatable("worldmarketplace.market_terminal.no_market"), true);
@@ -65,18 +66,22 @@ public class MarketTerminalItem extends BlockItem {
                         return InteractionResult.PASS; // what
                     }
                 }
+            } else {
+                if(blockEntity instanceof MarketBlockEntity marketBlockEntity) {
+                    return InteractionResult.SUCCESS;
+                }
             }
 
             // block place logic
             if(useOnContext.getClickedFace() == Direction.DOWN || useOnContext.getClickedFace() == Direction.UP) {
                 return InteractionResult.FAIL;
             }
-            var result = super.useOn(useOnContext);
             var itemStack = useOnContext.getItemInHand();
             var marketChunk = getMarketPosition(itemStack);
+            var result = super.useOn(useOnContext);
+            blockEntity = level.getBlockEntity(pos.relative(useOnContext.getClickedFace()));
             if(marketChunk != null && result == InteractionResult.CONSUME) {
-                if(level instanceof ServerLevel serverLevel) {
-                    var blockEntity = useOnContext.getLevel().getBlockEntity(useOnContext.getClickedPos().relative(useOnContext.getClickedFace()));
+                if(level instanceof ServerLevel serverLevel && !serverLevel.isClientSide) {
                     if(blockEntity instanceof MarketTerminalBlockEntity marketTerminalBlockEntity) {
                         marketTerminalBlockEntity.setMarketChunk(marketChunk);
                         marketTerminalBlockEntity.setChanged();
@@ -96,6 +101,17 @@ public class MarketTerminalItem extends BlockItem {
         }
 
         return InteractionResult.PASS;
+    }
+
+    @Override
+    public @NotNull InteractionResult place(@NotNull BlockPlaceContext blockPlaceContext) {
+        var stickedPos = blockPlaceContext.getClickedPos().relative(blockPlaceContext.getClickedFace().getOpposite());
+        var level = blockPlaceContext.getLevel();
+        var stickedState = level.getBlockState(stickedPos);
+        if (!stickedState.isFaceSturdy(level, stickedPos, blockPlaceContext.getClickedFace())) {
+            return InteractionResult.FAIL;
+        }
+        return super.place(blockPlaceContext);
     }
 
     @Override
