@@ -9,5 +9,6 @@
   "structure.minecraft.village_desert": "Desert Village",
   "structure.minecraft.village_savanna": "Savanna Village",
   "structure.minecraft.village_snowy": "Snowy Village",
-  "structure.minecraft.village_taiga": "Taiga Village"
+  "structure.minecraft.village_taiga": "Taiga Village",
+  "worldmarketplace.market_terminal.no_market": "This market block is not bind to a market"
 }
