@@ -34,4 +34,5 @@ public class PlayerVillageRepo {
             .map(tag -> ((LongTag) tag).getAsLong())
             .anyMatch(pos -> pos == villagePos.toLong());
     }
+
 }

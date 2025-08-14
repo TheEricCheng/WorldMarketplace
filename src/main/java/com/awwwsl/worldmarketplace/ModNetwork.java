@@ -20,5 +20,10 @@ public class ModNetwork {
             EconomyRepo.Packet::encode,
             EconomyRepo.Packet::new,
             EconomyRepo.Packet::handle);
+        CHANNEL.registerMessage(ID.getAndIncrement(), LocalizedName.Packet.class,
+            LocalizedName.Packet::encode,
+            LocalizedName.Packet::new,
+            LocalizedName.Packet::handle
+        );
     }
 }

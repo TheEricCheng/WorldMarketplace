@@ -2,6 +2,7 @@ package com.awwwsl.worldmarketplace.api;
 
 import com.awwwsl.worldmarketplace.ModNetwork;
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
+import com.awwwsl.worldmarketplace.client.ClientPacketHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -114,8 +115,7 @@ public class EconomyRepo {
             ctx.get().enqueueWork(() -> {
                 // 这里不要直接处理客户端逻辑
                 if (ctx.get().getDirection().getReceptionSide().isClient()) {
-                    // 只调用客户端处理器
-                    com.awwwsl.worldmarketplace.client.ClientEconomyPacketHandler.handle(balance);
+                    ClientPacketHandler.handleEconomyPacket(balance);
                 }
             });
             ctx.get().setPacketHandled(true);

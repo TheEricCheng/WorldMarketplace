@@ -8,6 +8,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraftforge.event.level.ChunkWatchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.network.PacketDistributor;
 
 public class PlayerListener {
     @SubscribeEvent
@@ -31,7 +33,8 @@ public class PlayerListener {
             }
             if(!PlayerVillageRepo.hasPlayerVisitedVillage(player, center.getChunkPos())) {
                 PlayerVillageRepo.setPlayerHasVisitedVillage(player, center.getChunkPos(), true);
-                player.connection.send(new ClientboundSetTitleTextPacket(Component.literal(market.name().get("latin"))));
+                var packet = new LocalizedName.Packet(market.name());
+                ModNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), packet);
             }
         }
     }
