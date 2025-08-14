@@ -51,7 +51,7 @@ public class NamePool {
         return randomName(languageMapping.getOrDefault(typeString, "latin"));
     }
     public LocalizedName randomName(String languageCode) {
-        Random r = new Random();
+        Random r = WorldmarketplaceMod.RANDOM;
 
         List<NameEntry> filteredPrefixes = prefixes.stream()
             .filter(e -> e.hasLanguage(languageCode))

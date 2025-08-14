@@ -42,6 +42,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,6 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unused")
 @Mod(WorldmarketplaceMod.MOD_ID)
 public class WorldmarketplaceMod {
+    public static final Random RANDOM = new Random();
     public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.00");
     public static final MathContext MATH_CONTEXT = new MathContext(4, RoundingMode.HALF_EVEN);
     public static final String PLAYER_ROOT_COMPOUND_NAME = "worldmarketplace";
