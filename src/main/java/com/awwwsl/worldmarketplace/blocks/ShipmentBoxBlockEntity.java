@@ -2,7 +2,7 @@ package com.awwwsl.worldmarketplace.blocks;
 
 import com.awwwsl.worldmarketplace.display.ShipmentBoxMenu;
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
-import com.awwwsl.worldmarketplace.api.Economy;
+import com.awwwsl.worldmarketplace.api.EconomyRepo;
 import com.awwwsl.worldmarketplace.api.Market;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -109,8 +109,8 @@ class ShipmentBoxItemHandler implements IItemHandler {
         }
 
         if(!simulate) {
-            Economy.sell(player, marketItem, stack.getCount());
-            player.sendSystemMessage(Component.literal("You have sold " + stack.getCount() + " " + item.getDescriptionId() + " for " + WorldmarketplaceMod.DECIMAL_FORMAT.format(marketItem.basePrice.multiply(BigDecimal.valueOf(stack.getCount()))) + " credits. Now you have " + Economy.getBalance(player) + " credits,"));
+            EconomyRepo.sell(player, marketItem, stack.getCount());
+            player.sendSystemMessage(Component.literal("You have sold " + stack.getCount() + " " + item.getDescriptionId() + " for " + WorldmarketplaceMod.DECIMAL_FORMAT.format(marketItem.basePrice.multiply(BigDecimal.valueOf(stack.getCount()))) + " credits. Now you have " + EconomyRepo.getBalance(player) + " credits,"));
         }
 
         return ItemStack.EMPTY;

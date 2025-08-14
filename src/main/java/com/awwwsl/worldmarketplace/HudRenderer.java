@@ -1,6 +1,6 @@
 package com.awwwsl.worldmarketplace;
 
-import com.awwwsl.worldmarketplace.api.Economy;
+import com.awwwsl.worldmarketplace.api.EconomyRepo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,7 +18,7 @@ public class HudRenderer {
         var player = Minecraft.getInstance().player;
         var font = Minecraft.getInstance().font;
         if (player != null) {
-            var balance = Economy.getBalance(player);
+            var balance = EconomyRepo.getBalance(player);
             var graphics = event.getGuiGraphics();
             graphics.drawString(font, Component.literal(WorldmarketplaceMod.DECIMAL_FORMAT.format(balance)), 10, 10, 0xFFFFFF);
         }

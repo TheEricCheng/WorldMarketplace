@@ -1,6 +1,6 @@
 package com.awwwsl.worldmarketplace.client;
 
-import com.awwwsl.worldmarketplace.api.Economy;
+import com.awwwsl.worldmarketplace.api.EconomyRepo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
@@ -11,7 +11,7 @@ public class ClientEconomyPacketHandler {
         Minecraft mc = Minecraft.getInstance();
         Player localPlayer = mc.player;
         if (localPlayer != null) {
-            Economy.setBalance(localPlayer, balance);
+            EconomyRepo.setBalance(localPlayer, balance);
         }
     }
 }

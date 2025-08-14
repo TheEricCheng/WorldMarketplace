@@ -19,8 +19,6 @@ import net.minecraft.world.level.levelgen.structure.StructureStart;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
 public abstract class MarketBlockEntity extends BlockEntity {
 
     public @Nullable ChunkPos getMarketChunk() {
@@ -70,13 +68,17 @@ public abstract class MarketBlockEntity extends BlockEntity {
         return marketData.getMarket(serverLevel, marketChunk);
     }
 
+    // This method initializes the market at the block's position.
     public void initializeMarket(ServerLevel level) {
         var start = WorldmarketplaceMod.Utils.queryCenter(level, getBlockPos());
         if(!tryValidateStart(start)) { return; }
         initializeMarket(level, start);
+        this.marketChunk = start.getChunkPos();
+        setChanged();
     }
 
-    public void initializeMarket(ServerLevel level, StructureStart start) {
+    // This method initializes the market based on the structure start.
+    public static void initializeMarket(ServerLevel level, StructureStart start) {
         validateStart(start);
 
         var savedData = MarketSavedData.get(level);
@@ -90,24 +92,21 @@ public abstract class MarketBlockEntity extends BlockEntity {
             market = createMarketFromDefaults(level, defaultMarket);
             savedData.saveMarket(level, chunkPos, market);
         }
-
-        this.marketChunk = chunkPos;
-        setChanged();
     }
 
-    private void validateStart(StructureStart start) {
+    private static void validateStart(StructureStart start) {
         if (start == StructureStart.INVALID_START) {
             throw new IllegalArgumentException("Invalid structure start provided");
         }
     }
-    private boolean tryValidateStart(StructureStart start) {
+    private static boolean tryValidateStart(StructureStart start) {
         if (start == StructureStart.INVALID_START) {
             return false;
         }
         return true;
     }
 
-    private MarketDefaults findDefaultMarket(ServerLevel level, StructureStart start) {
+    private static MarketDefaults findDefaultMarket(ServerLevel level, StructureStart start) {
         var worldDefaults = ModConfig.getWorldMarket(level.getServer());
         var defaults = worldDefaults.markets();
 
@@ -120,16 +119,10 @@ public abstract class MarketBlockEntity extends BlockEntity {
             .orElse(null);
     }
 
-    private Market createMarketFromDefaults(ServerLevel level, MarketDefaults defaults) {
+    private static Market createMarketFromDefaults(ServerLevel level, MarketDefaults defaults) {
         var itemRegistry = level.getServer().registryAccess().registryOrThrow(Registries.ITEM);
-
-        return Market.newFromDefaultsFilter(defaults, marketItem -> {
-            if (itemRegistry.getOptional(marketItem.id).isEmpty()) {
-                WorldmarketplaceMod.LOGGER.warn("Market item {} not found in registry, skipping", marketItem.id);
-                return false;
-            }
-            return true;
-        });
+        var namePool = ModConfig.getNamePool(level.getServer());
+        return Market.newFromDefaults(defaults, namePool, itemRegistry);
     }
 
     public CompoundTag writeMarket() {

@@ -1,7 +1,7 @@
 package com.awwwsl.worldmarketplace.display;
 
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
-import com.awwwsl.worldmarketplace.api.Economy;
+import com.awwwsl.worldmarketplace.api.EconomyRepo;
 import com.awwwsl.worldmarketplace.api.Market;
 import com.awwwsl.worldmarketplace.api.MarketItemType;
 import net.minecraft.ChatFormatting;
@@ -157,7 +157,7 @@ public class InboxMenu extends AbstractContainerMenu {
             });
             var needBuy = Math.min(howMany, canBuy.get());
             var total = needBuy;
-            if(Economy.buy(serverPlayer, marketItem, needBuy)) {
+            if(EconomyRepo.buy(serverPlayer, marketItem, needBuy)) {
                 while(needBuy > 0) {
                     var gave = new ItemStack(item);
                     gave.setCount(Math.min(item.getMaxStackSize(gave), needBuy));
@@ -171,7 +171,7 @@ public class InboxMenu extends AbstractContainerMenu {
                 }
                 serverPlayer.sendSystemMessage(Component.literal("已购买 " + total + " 件物品: ").append(item.getDescription()).withStyle(ChatFormatting.GREEN));
             } else {
-                serverPlayer.sendSystemMessage(Component.literal("Expected: ").append(WorldmarketplaceMod.DECIMAL_FORMAT.format(Economy.getPrice(marketItem, needBuy))).append(". Actual: ").append(WorldmarketplaceMod.DECIMAL_FORMAT.format(Economy.getBalance(serverPlayer))).withStyle(ChatFormatting.RED), false);
+                serverPlayer.sendSystemMessage(Component.literal("Expected: ").append(WorldmarketplaceMod.DECIMAL_FORMAT.format(EconomyRepo.getPrice(marketItem, needBuy))).append(". Actual: ").append(WorldmarketplaceMod.DECIMAL_FORMAT.format(EconomyRepo.getBalance(serverPlayer))).withStyle(ChatFormatting.RED), false);
             }
         }
     }

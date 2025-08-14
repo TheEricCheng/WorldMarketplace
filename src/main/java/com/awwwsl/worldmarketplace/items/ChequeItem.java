@@ -1,8 +1,7 @@
 package com.awwwsl.worldmarketplace.items;
 
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
-import com.awwwsl.worldmarketplace.api.Economy;
-import io.netty.util.concurrent.EventExecutorChooserFactory;
+import com.awwwsl.worldmarketplace.api.EconomyRepo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -71,7 +70,7 @@ public class ChequeItem extends Item {
         }
         var serverPlayer = (ServerPlayer)player;
         var value = getValue(item);
-        Economy.setBalance(serverPlayer, Economy.getBalance(serverPlayer).add(value));
+        EconomyRepo.setBalance(serverPlayer, EconomyRepo.getBalance(serverPlayer).add(value));
         item.shrink(1);
         return InteractionResultHolder.success(item);
     }

@@ -1,7 +1,7 @@
 package com.awwwsl.worldmarketplace.display;
 
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
-import com.awwwsl.worldmarketplace.api.Economy;
+import com.awwwsl.worldmarketplace.api.EconomyRepo;
 import com.awwwsl.worldmarketplace.api.Market;
 import com.awwwsl.worldmarketplace.api.MarketItemType;
 import net.minecraft.ChatFormatting;
@@ -151,7 +151,7 @@ public class ShipmentBoxMenu extends AbstractContainerMenu {
             );
             if(sold > 0) {
                 serverPlayer.sendSystemMessage(Component.literal("已出售 " + sold + " 件物品: ").append(item.getDescription()).withStyle(ChatFormatting.GREEN));
-                Economy.sell(serverPlayer, marketItem, sold);
+                EconomyRepo.sell(serverPlayer, marketItem, sold);
             } else if(sold == 0) {
                 serverPlayer.sendSystemMessage(Component.literal("没有物品可以出售: ").append(item.getDescription()).withStyle(ChatFormatting.RED));
             }

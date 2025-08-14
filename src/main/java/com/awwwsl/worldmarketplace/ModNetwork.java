@@ -1,6 +1,6 @@
 package com.awwwsl.worldmarketplace;
 
-import com.awwwsl.worldmarketplace.api.Economy;
+import com.awwwsl.worldmarketplace.api.EconomyRepo;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -14,9 +14,9 @@ public class ModNetwork {
 
     public static void register() {
         int id = 0;
-        CHANNEL.registerMessage(id++, Economy.Packet.class,
-            Economy.Packet::encode,
-            Economy.Packet::new,
-            Economy.Packet::handle);
+        CHANNEL.registerMessage(id++, EconomyRepo.Packet.class,
+            EconomyRepo.Packet::encode,
+            EconomyRepo.Packet::new,
+            EconomyRepo.Packet::handle);
     }
 }

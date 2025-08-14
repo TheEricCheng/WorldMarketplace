@@ -1,6 +1,6 @@
 package com.awwwsl.worldmarketplace;
 
-import com.awwwsl.worldmarketplace.api.Economy;
+import com.awwwsl.worldmarketplace.api.EconomyRepo;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -54,7 +54,7 @@ public class ModCommands {
                         source.sendFailure(Component.literal("Amount cannot be negative."));
                         return 0;
                     }
-                    Economy.setBalance(ctx.getSource().getPlayer(), BigDecimal.valueOf(amount));
+                    EconomyRepo.setBalance(ctx.getSource().getPlayer(), BigDecimal.valueOf(amount));
                     source.sendSuccess(() -> Component.literal("Current economy have been set to " + WorldmarketplaceMod.DECIMAL_FORMAT.format(amount)), true);
                     return 1;
                 }));
@@ -68,11 +68,11 @@ public class ModCommands {
                     }
                     CommandSourceStack source = ctx.getSource();
                     WorldmarketplaceMod.DECIMAL_FORMAT.setRoundingMode(RoundingMode.HALF_EVEN);
-                    source.sendSuccess(() -> Component.literal("Current economy balance: " + WorldmarketplaceMod.DECIMAL_FORMAT.format(Economy.getBalance(Objects.requireNonNull(ctx.getSource().getPlayer())))), true);
+                    source.sendSuccess(() -> Component.literal("Current economy balance: " + WorldmarketplaceMod.DECIMAL_FORMAT.format(EconomyRepo.getBalance(Objects.requireNonNull(ctx.getSource().getPlayer())))), true);
                     return 1;
                 }).then(Commands.argument("player", EntityArgument.player()).executes(ctx -> {
                     var player = EntityArgument.getPlayer(ctx, "player");
-                    ctx.getSource().sendSuccess(() -> Component.literal("Current economy balance for " + player.getDisplayName().getString() + ": " + WorldmarketplaceMod.DECIMAL_FORMAT.format(Economy.getBalance(player))), true);
+                    ctx.getSource().sendSuccess(() -> Component.literal("Current economy balance for " + player.getDisplayName().getString() + ": " + WorldmarketplaceMod.DECIMAL_FORMAT.format(EconomyRepo.getBalance(player))), true);
                     return 0;
                 }));
     }

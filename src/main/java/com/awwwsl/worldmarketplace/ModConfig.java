@@ -22,14 +22,23 @@ import java.nio.file.Path;
 public class ModConfig {
     private static final Object LOCK = new Object();
     private static volatile WorldMarketDefaults worldMarketDefaults = null;
+    private static volatile NamePool namePool = null;
 
-    private static File resolveWorldConfig(MinecraftServer server) {
+    private static @NotNull File resolveWorldConfig(@NotNull MinecraftServer server) {
         Path world = server.getWorldPath(LevelResource.ROOT);
         return world.resolve("serverconfig/worldmarketplace.toml").toFile();
     }
 
-    private static File resolveDefaultFile() {
+    private static @NotNull File resolveNamePool(@NotNull MinecraftServer server) {
+        Path world = server.getWorldPath(LevelResource.ROOT);
+        return world.resolve("serverconfig/worldmarketplace-namepool.json").toFile();
+    }
+
+    private static @NotNull File resolveDefaultWorldConfig() {
         return FMLPaths.CONFIGDIR.get().getParent().resolve("defaultconfigs").resolve("worldmarketplace.toml").toFile();
+    }
+    private static @NotNull File resolveDefaultNamePool() {
+        return FMLPaths.CONFIGDIR.get().getParent().resolve("defaultconfigs").resolve("worldmarketplace-namepool.toml").toFile();
     }
 
     public static @NotNull WorldMarketDefaults getWorldMarket(MinecraftServer server) {
@@ -41,6 +50,21 @@ public class ModConfig {
             }
         }
         return worldMarketDefaults;
+    }
+    public static @NotNull NamePool getNamePool(MinecraftServer server) {
+        if (namePool == null) {
+            synchronized (LOCK) {
+                if (namePool == null) {
+                    try {
+                        namePool = NamePool.fromFile(resolveNamePool(server));
+                    } catch (IOException e) {
+                        WorldmarketplaceMod.LOGGER.error("Failed to load name pool from file", e);
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+        return namePool;
     }
 
     public static void reset() {
@@ -88,7 +112,18 @@ public class ModConfig {
                 worldConfig.getParentFile().mkdir();
             }
             try {
-                Files.copy(resolveDefaultFile().toPath(), worldConfig.toPath());
+                Files.copy(resolveDefaultWorldConfig().toPath(), worldConfig.toPath());
+            } catch(IOException ignored) {}
+        }
+    }
+    private static void copyNamePoolToWorld(MinecraftServer server) {
+        var namePoolFile = resolveNamePool(server);
+        if(!namePoolFile.exists()) {
+            if(!namePoolFile.getParentFile().exists()) {
+                namePoolFile.getParentFile().mkdir();
+            }
+            try {
+                Files.copy(resolveDefaultNamePool().toPath(), namePoolFile.toPath());
             } catch(IOException ignored) {}
         }
     }
@@ -96,7 +131,7 @@ public class ModConfig {
     // Optional preload if you want
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
-        var defaultConfig = resolveDefaultFile();
+        var defaultConfig = resolveDefaultWorldConfig();
         try {
             if (!defaultConfig.exists()) {
                 if(!defaultConfig.getParentFile().exists()) {

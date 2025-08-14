@@ -1,7 +1,7 @@
 package com.awwwsl.worldmarketplace.display;
 
 import com.awwwsl.worldmarketplace.WorldmarketplaceMod;
-import com.awwwsl.worldmarketplace.api.Economy;
+import com.awwwsl.worldmarketplace.api.EconomyRepo;
 import com.awwwsl.worldmarketplace.api.Market;
 import com.awwwsl.worldmarketplace.items.ChequeItem;
 import net.minecraft.network.FriendlyByteBuf;
@@ -103,10 +103,10 @@ public class CommunityCenterMenu extends AbstractContainerMenu {
                 return;
             }
 
-            if(!Economy.withdraw(serverPlayer, amount, true)) {
+            if(!EconomyRepo.withdraw(serverPlayer, amount, true)) {
                 serverPlayer.sendSystemMessage(Component.nullToEmpty("No enough balance to withdraw " + amount));
             } else {
-                Economy.withdraw(serverPlayer, amount, false);
+                EconomyRepo.withdraw(serverPlayer, amount, false);
                 if(!serverPlayer.getInventory().add(ChequeItem.from(amount))) {
                     var drop = serverPlayer.drop(ChequeItem.from(amount), false);
                     if(drop != null) {

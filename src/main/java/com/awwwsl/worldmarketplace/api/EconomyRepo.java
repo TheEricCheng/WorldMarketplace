@@ -17,9 +17,9 @@ import java.math.BigDecimal;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = WorldmarketplaceMod.MOD_ID)
-public class Economy {
+public class EconomyRepo {
     public static BigDecimal getBalance(Player player) {
-        var compound = player.getPersistentData().getCompound("worldmarketplace");
+        var compound = player.getPersistentData().getCompound(WorldmarketplaceMod.PLAYER_ROOT_COMPOUND_NAME);
         var balance = compound.getString("balance");
         if(balance.isEmpty()) {
             return BigDecimal.ZERO;
@@ -38,7 +38,7 @@ public class Economy {
         if(amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Amount cannot be negative: " + amount);
         }
-        var compound = player.getPersistentData().getCompound("worldmarketplace");
+        var compound = player.getPersistentData().getCompound(WorldmarketplaceMod.PLAYER_ROOT_COMPOUND_NAME);
         compound.putString("balance", amount.toString());
         player.getPersistentData().put("worldmarketplace", compound);
         sync(player);

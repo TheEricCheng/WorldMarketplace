@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -40,6 +42,8 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @SuppressWarnings("unused")
@@ -47,6 +51,7 @@ import java.util.Optional;
 public class WorldmarketplaceMod {
     public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.00");
     public static final MathContext MATH_CONTEXT = new MathContext(4, RoundingMode.HALF_EVEN);
+    public static final String PLAYER_ROOT_COMPOUND_NAME = "worldmarketplace";
 
     static {
         DECIMAL_FORMAT.setRoundingMode(RoundingMode.HALF_EVEN);
@@ -114,6 +119,8 @@ public class WorldmarketplaceMod {
                     .build()
     );
 
+    public static final Set<ServerPlayer> ON_WATCHING_PLAYERS = ConcurrentHashMap.newKeySet();
+
     public WorldmarketplaceMod() {
         @SuppressWarnings("removal") IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -123,7 +130,8 @@ public class WorldmarketplaceMod {
         MENU_TYPES.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        modEventBus.register(this);
+        IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
+        forgeEventBus.register(new PlayerListener());
 
         ModNetwork.register();
     }

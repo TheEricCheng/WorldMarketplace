@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "NamePool",
+    "type": "object",
+    "properties": {
+        "prefixes": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/NameEntry" }
+        },
+        "suffixes": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/NameEntry" }
+        },
+        "languageMapping": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+        }
+    },
+    "required": ["prefixes", "suffixes", "languageMapping"],
+    "definitions": {
+        "NameEntry": {
+            "type": "object",
+            "properties": {
+                "id": { "type": "string", "minLength": 1 },
+                "names": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "additionalProperties": { "type": "string" }
+                },
+                "meaning": { "type": "string" },
+                "lang": { "type": "string" }
+            },
+            "required": ["id", "names", "meaning", "lang"],
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}
